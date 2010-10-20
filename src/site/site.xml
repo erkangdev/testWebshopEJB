@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<skin>
+		<groupId>org.apache.maven.skins</groupId>
+		<artifactId>maven-default-skin</artifactId>
+		<version>1.0</version>
+	</skin>
+
+	<body>
+		<menu name="testHskaArquillian">
+			<item name="Home" href="index.html"/>
+			<item name="Summary" href="project-summary.html"/>
+			<item name="Overview" href="project-info.html"/>
+			<item name="Dependencies" href="dependencies.html"/>
+			<item name="Reports" href="project-reports.html"/>
+			<item name="Projectteam" href="team-list.html"/>
+		</menu>
+	</body>
+</project>
