@@ -7,6 +7,7 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import en.webshop.test.ItemManagementTest;
 import en.webshop.test.ProfileManagementTest;
 
 
@@ -36,6 +37,7 @@ public abstract class ArchiveUtil {
 		ejbJar.as(ExplodedImporter.class).importDirectory(EJB_DIR);
 		// Testklassen mitverpacken, damit sie im JBoss aufgerufen werden
 		ejbJar.addPackage(ProfileManagementTest.class.getPackage());
+		ejbJar.addPackage(ItemManagementTest.class.getPackage());
 		// Die Hilfsklassen DbReloadProvider und DbReload werden in den JUnit-Tests aufgerufen und
 		// muessen deshalb mitverpackt werden
 		ejbJar.addClasses(DbReloadProvider.class, DbReload.class);
