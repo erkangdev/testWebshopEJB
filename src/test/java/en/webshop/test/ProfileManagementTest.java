@@ -1,6 +1,5 @@
 package en.webshop.test;
 
-import static en.webshop.profileManagement.service.ProfileManagementImpl.PARAM_DEACTIVATE_PROFILE;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -16,6 +15,7 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import org.dbunit.DatabaseUnitException;
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,28 +23,23 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import en.webshop.profileManagement.db.ProfileNotFoundException;
-import en.webshop.profileManagement.pojo.Address;
-import en.webshop.profileManagement.pojo.Profile;
+import en.webshop.profileManagement.service.ProfileNotFoundException;
+import en.webshop.profileManagement.domain.Profile;
 import en.webshop.profileManagement.service.InvalidEmailException;
 import en.webshop.profileManagement.service.InvalidLastNameException;
-import en.webshop.profileManagement.service.InvalidProfileIdException;
+import en.webshop.profileManagement.service.InvalidEmailException;
 import en.webshop.profileManagement.service.ProfileDeleteOrderException;
-import en.webshop.profileManagement.service.ProfileDuplikatException;
+import en.webshop.profileManagement.service.ProfileDuplicateException;
 import en.webshop.profileManagement.service.ProfileManagement;
-import en.webshop.profileManagement.service.ProfileManagementImpl;
 import en.webshop.profileManagement.service.ProfileValidationException;
-import en.webshop.profileManagement.service.StatusIsAlreadySetException;
+import en.webshop.profileManagement.service.StatusAlreadySetException;
 import en.webshop.test.util.DbReload;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="classpath:test.xml")
+@RunWith(Arquillian.class)
 public class ProfileManagementTest {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ProfileManagementImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProfileManagement.class);
 	
 	private static final Locale LOCALE = Locale.GERMAN;
 	
