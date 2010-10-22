@@ -34,7 +34,7 @@ import en.webshop.test.util.DbReloadProvider;
 
 
 @RunWith(Arquillian.class)
-public class ItemManagementTest {
+public class ArticleManagementTest {
 	
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
