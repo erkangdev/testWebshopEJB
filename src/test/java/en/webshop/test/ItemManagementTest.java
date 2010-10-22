@@ -4,64 +4,87 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
+import javax.ejb.EJB;
 
-import org.dbunit.DatabaseUnitException;
+import org.jboss.arquillian.api.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.security.client.SecurityClient;
+import org.jboss.security.client.SecurityClientFactory;
+import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import en.webshop.itemManagement.db.AttributeNotFoundException;
-import en.webshop.itemManagement.db.CategoryNotFoundException;
-import en.webshop.itemManagement.db.ItemNotFoundException;
-import en.webshop.itemManagement.pojo.Attribute;
-import en.webshop.itemManagement.pojo.Category;
-import en.webshop.itemManagement.pojo.Item;
-import en.webshop.itemManagement.service.ItemManagement;
-import en.webshop.test.util.DbReload;
+import en.webshop.articleManagement.domain.Article;
+import en.webshop.articleManagement.domain.Attribute;
+import en.webshop.articleManagement.domain.Category;
+import en.webshop.articleManagement.service.ArticleManagement;
+import en.webshop.articleManagement.service.ArticleNotFoundException;
+import en.webshop.articleManagement.service.AttributeNotFoundException;
+import en.webshop.articleManagement.service.CategoryNotFoundException;
+import en.webshop.test.util.ArchiveUtil;
+import en.webshop.test.util.DbReloadProvider;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="classpath:test.xml")
+@RunWith(Arquillian.class)
 public class ItemManagementTest {
 	
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	private static final Integer ITEMID_AVAILABLE = 501;
+	private static final String ITEMID_AVAILABLE = "501";
 	private static final String CATEGORY_NAME_AVAILABLE = "Dimension";
 	private static final String ATTRIBUTE_NAME_AVAILABLE = "Holz";
-
-	@Inject
-	private ItemManagement im;
 	
+	private static SecurityClient securityClient;
 	
+	private static final String CONCURRENT_UPDATE = "update";
+	private static final String CONCURRENT_DELETE = "delete";
+	
+	@EJB
+	private ArticleManagement am;
+	
+	/**
+	 */
+	@Deployment
+	public static EnterpriseArchive createTestArchive() {
+		return ArchiveUtil.getTestArchive();
+	}
+	
+	/**
+	 */
 	@BeforeClass
-	public static void reloadDB() throws SQLException, DatabaseUnitException, ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
-		DbReload.reload();
+	public static void init() {
+		try {
+			DbReloadProvider.reload();
+			securityClient = SecurityClientFactory.getSecurityClient();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		
+		assertThat(securityClient, is(notNullValue()));
 	}
 	
 	
 	@Test
-	public void findItemVorhanden() throws ItemNotFoundException {
+	public void findItemVorhanden() throws ArticleNotFoundException {
 		
 		// ItemId 501
-		final Integer itemId = ITEMID_AVAILABLE;
+		final String articleNo = ITEMID_AVAILABLE;
 		
 		// Suche ein objekt anhand einer vorhandenen itemID
-		final Item item = im.findItemById(itemId);
+		final Article article = am.findArticleByArticleNo(articleNo);
 		
 		// Speichere alle attribute des item objekts in attributes 
-		final List<Attribute> attributes = item.getAttributes();
+		final List<Attribute> attributes = article.getAttributes();
 		
 		// Item 501 hat Attribute 5,12,14,?,
 		assertThat(attributes.isEmpty(),is(false));
@@ -75,7 +98,7 @@ public class ItemManagementTest {
 			for (int i = 0; i < attributes.size(); i++) {
 
 				// hole zu jedem attribute alle items
-				List <Item> itemsPerAttribute = attributes.get(i).getItems();
+				List <Article> itemsPerAttribute = attributes.get(i).getArticles();
 				
 				// Item(501).Attribute.Items.containItemWithID(501)
 				for (int j = 0; j <itemsPerAttribute.size(); j++) {
@@ -90,29 +113,30 @@ public class ItemManagementTest {
 					if(count != 1)
 						doeswork = false;
 						*/
-					if (itemsPerAttribute.get(j).getItemId() == 501)
-						assertThat(item, is(sameInstance(itemsPerAttribute.get(j))));
+					if (itemsPerAttribute.get(j).getArticleNo() == "501")
+						assertThat(article, is(sameInstance(itemsPerAttribute.get(j))));
 				}
 			}
 		}
 	}
 	
 	@Test
-	public void findItemByFaultId() throws ItemNotFoundException{
-		thrown.expect(ItemNotFoundException.class);
-		Item item = im.findItemById(-1);
+	public void findItemByFaultId() throws ArticleNotFoundException{
+		thrown.expect(ArticleNotFoundException.class);
+		@SuppressWarnings("unused")
+		Article article = am.findArticleByArticleNo("-1");
 	}
 	
 	@Test
 	public void findCategoriesAvailable() throws CategoryNotFoundException {
-		final Collection<Category> categories = im.findCategories();
+		final Collection<Category> categories = am.findAllCategories();
 		assertThat(categories.isEmpty(),is(false));
 	}
 	
 	@Test
 	public void findCategoriesByName() throws CategoryNotFoundException {
 		final String catname = CATEGORY_NAME_AVAILABLE;
-		final Collection<Category> categories = im.findCategoriesByName(catname);
+		final Collection<Category> categories = am.findCategoriesByName(catname);
 		assertThat(categories.isEmpty(),is(false));
 		for (Category c: categories) {
 			assertThat(c.getName().equals(catname), is(true));
@@ -121,14 +145,14 @@ public class ItemManagementTest {
 	
 	@Test
 	public void findAttributesAvailable() throws AttributeNotFoundException {
-		final Collection<Attribute> attributes = im.findAttributes();
+		final Collection<Attribute> attributes = am.findAllAttributes();
 		assertThat(attributes.isEmpty(),is(false));
 	}
 	
 	@Test
 	public void findAttributesByName() throws AttributeNotFoundException {
 		final String attributename = ATTRIBUTE_NAME_AVAILABLE;
-		final Collection<Attribute> attributes = im.findAttributesByName(attributename);
+		final Collection<Attribute> attributes = am.findAttributesByName(attributename);
 		assertThat(attributes.isEmpty(),is(false));
 		for (Attribute a: attributes) {
 			assertThat(a.getName().equals(attributename), is(true));
