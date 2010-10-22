@@ -1,4 +1,4 @@
-package de.hska.test.util;
+package en.webshop.test.util;
 
 
 import static org.dbunit.operation.DatabaseOperation.CLEAN_INSERT;

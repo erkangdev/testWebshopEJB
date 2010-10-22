@@ -1,4 +1,4 @@
-package de.hska.test.util;
+package en.webshop.test.util;
 
 public interface DbReload {
 	void reload() throws Exception;

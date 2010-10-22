@@ -1,4 +1,4 @@
-package de.hska.test.util;
+package en.webshop.test.util;
 
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.importer.ExplodedImporter;
@@ -7,7 +7,7 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.hska.test.KundenverwaltungTest;
+import en.webshop.test.ProfileManagementTest;
 
 
 public abstract class ArchiveUtil {
@@ -35,7 +35,7 @@ public abstract class ArchiveUtil {
 		final JavaArchive ejbJar = ShrinkWrap.create(JavaArchive.class, PROJEKT_NAME + "EJB.jar");
 		ejbJar.as(ExplodedImporter.class).importDirectory(EJB_DIR);
 		// Testklassen mitverpacken, damit sie im JBoss aufgerufen werden
-		ejbJar.addPackage(KundenverwaltungTest.class.getPackage());
+		ejbJar.addPackage(ProfileManagementTest.class.getPackage());
 		// Die Hilfsklassen DbReloadProvider und DbReload werden in den JUnit-Tests aufgerufen und
 		// muessen deshalb mitverpackt werden
 		ejbJar.addClasses(DbReloadProvider.class, DbReload.class);
