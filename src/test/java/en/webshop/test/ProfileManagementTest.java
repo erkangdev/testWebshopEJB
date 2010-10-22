@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.matchers.JUnitMatchers.both;
 import static org.junit.matchers.JUnitMatchers.either;
 
@@ -12,13 +13,19 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Locale;
 
+import javax.ejb.EJB;
 import javax.inject.Inject;
 
 import org.dbunit.DatabaseUnitException;
+import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.security.client.SecurityClient;
+import org.jboss.security.client.SecurityClientFactory;
+import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.internal.matchers.CombinableMatcher;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -34,7 +41,9 @@ import en.webshop.profileManagement.service.ProfileDuplicateException;
 import en.webshop.profileManagement.service.ProfileManagement;
 import en.webshop.profileManagement.service.ProfileValidationException;
 import en.webshop.profileManagement.service.StatusAlreadySetException;
+import en.webshop.test.util.ArchiveUtil;
 import en.webshop.test.util.DbReload;
+import en.webshop.test.util.DbReloadProvider;
 
 
 @RunWith(Arquillian.class)
@@ -46,7 +55,12 @@ public class ProfileManagementTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 	
-	@Inject
+	private static SecurityClient securityClient;
+	
+	private static final String CONCURRENT_UPDATE = "update";
+	private static final String CONCURRENT_DELETE = "delete";
+	
+	@EJB
 	private ProfileManagement pm;
 	
 	private static final char PROFILE_ROLE_CUSTOMER = 'C';
@@ -72,9 +86,27 @@ public class ProfileManagementTest {
 	private static final String ADDRESS_NEW_CITY = "New City";
 	private static final char ADDRESS_STATUS = 'A';
 	
+	/**
+	 */
+	@Deployment
+	public static EnterpriseArchive createTestArchive() {
+		return ArchiveUtil.getTestArchive();
+	}
+	
+	/**
+	 */
 	@BeforeClass
-	public static void reloadDB() throws SQLException, DatabaseUnitException, ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
-		DbReload.reload();
+	public static void init() {
+		try {
+			DbReloadProvider.reload();
+			securityClient = SecurityClientFactory.getSecurityClient();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		
+		assertThat(securityClient, is(notNullValue()));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -88,6 +120,8 @@ public class ProfileManagementTest {
 
 		for (Profile p: profiles) {
 			assertThat(p.getLastName(), is(lastName));
+			assertThat(3, either(matches(is(String.class))).or( 
+                    matches(is(Integer.class)))); 
 			assertThat(p.getRole(), either(is(PROFILE_ROLE_CUSTOMER)).or(is(PROFILE_ROLE_VENDOR)).or(is(PROFILE_ROLE_ADMIN)));
 			
 			// Nur zur Veranschaulichung von both().and()
@@ -142,7 +176,7 @@ public class ProfileManagementTest {
 	}
 
 	@Test // error
-	public void createProfile() throws ProfileDuplikatException, ProfileValidationException {
+	public void createProfile() throws ProfileDuplicateException, ProfileValidationException {
 		final String lastName = PROFILE_NEW_LAST_NAME;
 		final String email = PROFILE_NEW_EMAIL;
 		final String telephoneNo = PROFILE_NEW_TELEPHONE_NO;
@@ -156,21 +190,12 @@ public class ProfileManagementTest {
 		final char aStatus = ADDRESS_STATUS;
 		
 		final Profile newProfile = new Profile();
-		final Address address = new Address();
 		
 		newProfile.setLastName(lastName);
 		newProfile.setEmail(email);
 		newProfile.setTelephoneNo(telephoneNo);
 		newProfile.setRole(role);
 		newProfile.setStatus(pStatus);
-		
-		newProfile.setAddress(address);
-		newProfile.getAddress().setName(name);
-		newProfile.getAddress().setRoad(road);
-		newProfile.getAddress().setHouseNo(houseNo);
-		newProfile.getAddress().setZipCode(zipCode);
-		newProfile.getAddress().setCity(city);
-		newProfile.getAddress().setStatus(aStatus);
 		
 		pm.createProfile(newProfile, LOCALE, false);
 		assertThat(newProfile, is(notNullValue()));
