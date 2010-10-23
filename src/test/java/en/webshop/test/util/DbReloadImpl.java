@@ -30,9 +30,9 @@ public class DbReloadImpl implements DbReload {
 	private static final String URL;
 	private static final String URL_DEFAULT = "jdbc:postgresql:jbossdb";
 	private static final String SCHEMA;
-	private static final String SCHEMA_DEFAULT = "hska";
+	private static final String SCHEMA_DEFAULT = "webshop";
 	private static final String USERNAME;
-	private static final String USERNAME_DEFAULT = "hska";
+	private static final String USERNAME_DEFAULT = "webshop";
 	private static final String PASSWORD;
 	private static final String XML_FLAT_DATASET;
 	private static final String XML_FLAT_DATASET_DEFAULT = "db.xml";
