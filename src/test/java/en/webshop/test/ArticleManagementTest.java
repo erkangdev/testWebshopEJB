@@ -6,21 +6,27 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 import javax.ejb.EJB;
+import javax.security.auth.login.LoginException;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.security.client.SecurityClient;
 import org.jboss.security.client.SecurityClientFactory;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import en.webshop.articleManagement.domain.Article;
 import en.webshop.articleManagement.domain.Attribute;
@@ -35,14 +41,18 @@ import en.webshop.test.util.DbReloadProvider;
 
 @RunWith(Arquillian.class)
 public class ArticleManagementTest {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ArticleManagementTest.class);
+	
+	private static final Locale LOCALE = Locale.GERMAN;
 	
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
+	
+	private static SecurityClient securityClient; //TODO sieht anders aus als im Beispiel, warum?
+	
 	private static final String ITEMID_AVAILABLE = "501";
 	private static final String CATEGORY_NAME_AVAILABLE = "Dimension";
 	private static final String ATTRIBUTE_NAME_AVAILABLE = "Holz";
-	
-	private static SecurityClient securityClient;
 	
 	private static final String CONCURRENT_UPDATE = "update";
 	private static final String CONCURRENT_DELETE = "delete";
@@ -73,9 +83,11 @@ public class ArticleManagementTest {
 		assertThat(securityClient, is(notNullValue()));
 	}
 	
+	// TODO login
 	
 	@Test
 	public void findItemVorhanden() throws ArticleNotFoundException {
+		LOGGER.debug("BEGINN findItemVorhanden");
 		
 		// ItemId 501
 		final String articleNo = ITEMID_AVAILABLE;
@@ -118,6 +130,8 @@ public class ArticleManagementTest {
 				}
 			}
 		}
+		
+		LOGGER.debug("ENDE findItemVorhanden");
 	}
 	
 	@Test
