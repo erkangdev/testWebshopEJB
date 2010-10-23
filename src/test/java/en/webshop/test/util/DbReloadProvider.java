@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class DbReloadProvider {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DbReloadProvider.class);
-	private static final String IMPL_CLASS = "de.hska.test.util.DbReloadImpl";
+	private static final String IMPL_CLASS = "en.webshop.test.util.DbReloadImpl";
 
 	/**
 	 */
