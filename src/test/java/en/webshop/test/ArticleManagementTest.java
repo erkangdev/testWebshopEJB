@@ -48,7 +48,7 @@ public class ArticleManagementTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 	
-	private static SecurityClient securityClient; //TODO sieht anders aus als im Beispiel, warum?
+	private static SecurityClient securityClient;
 	
 	private static final String ITEMID_AVAILABLE = "501";
 	private static final String CATEGORY_NAME_AVAILABLE = "Dimension";
