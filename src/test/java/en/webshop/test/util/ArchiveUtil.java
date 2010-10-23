@@ -14,7 +14,7 @@ import en.webshop.test.ProfileManagementTest;
 public abstract class ArchiveUtil {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ArchiveUtil.class);
 	
-	private static final String PROJEKT_NAME = "hska";
+	private static final String PROJEKT_NAME = "webshop";
 	
 	private static final String EAR_DIR = "../" + PROJEKT_NAME + "/EarContent";
 	private static final String EJB_DIR = "../" + PROJEKT_NAME + "EJB/build/classes";
