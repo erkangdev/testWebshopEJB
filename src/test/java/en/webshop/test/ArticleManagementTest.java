@@ -50,7 +50,7 @@ public class ArticleManagementTest {
 	
 	private static SecurityClient securityClient;
 	
-	private static final String ITEMID_AVAILABLE = "501";
+	private static final String ARTICLE_NO_AVAILABLE = "VZ90/10";
 	private static final String CATEGORY_NAME_AVAILABLE = "Dimension";
 	private static final String ATTRIBUTE_NAME_AVAILABLE = "Holz";
 	
@@ -86,22 +86,22 @@ public class ArticleManagementTest {
 	// TODO login
 	
 	@Test
-	public void findItemVorhanden() throws ArticleNotFoundException {
-		LOGGER.debug("BEGINN findItemVorhanden");
+	public void findArticleVorhanden() throws ArticleNotFoundException {
+		LOGGER.debug("BEGINN findArticleVorhanden");
 		
-		// ItemId 501
-		final String articleNo = ITEMID_AVAILABLE;
+		// ArticleNo VZ90/10
+		final String articleNo = ARTICLE_NO_AVAILABLE;
 		
-		// Suche ein objekt anhand einer vorhandenen itemID
+		// Suche ein objekt anhand einer vorhandenen articleNo
 		final Article article = am.findArticleByArticleNo(articleNo);
 		
-		// Speichere alle attribute des item objekts in attributes 
+		// Speichere alle attribute des article objekts in attributes 
 		final List<Attribute> attributes = article.getAttributes();
 		
-		// Item 501 hat Attribute 5,12,14,?,
+		// Artikel VZ90/10 hat Attribute 5,12,14,?,
 		assertThat(attributes.isEmpty(),is(false));
 		
-		// Hole alle items zu jedem attribute des objekts item
+		// Hole alle Artikel zu jedem attribute des objekts article
 		if(attributes != null)
 		{
 			// Falls irgendwo die Verbindung nicht passt wird die var false
@@ -109,33 +109,33 @@ public class ArticleManagementTest {
 			
 			for (int i = 0; i < attributes.size(); i++) {
 
-				// hole zu jedem attribute alle items
-				List <Article> itemsPerAttribute = attributes.get(i).getArticles();
+				// hole zu jedem attribute alle articles
+				List <Article> articlesPerAttribute = attributes.get(i).getArticles();
 				
-				// Item(501).Attribute.Items.containItemWithID(501)
-				for (int j = 0; j <itemsPerAttribute.size(); j++) {
+				// article(501).Attribute.articles.containarticleWithID(501)
+				for (int j = 0; j <articlesPerAttribute.size(); j++) {
 					// Umstaendlich TODO: Weg wenn andere methode funktioniert:
-					// ueberpruefe ob bei jedem attribute genau ein item 
-					// das gleiche ist wie das objekt item
+					// ueberpruefe ob bei jedem attribute genau ein article 
+					// das gleiche ist wie das objekt article
 					/*
 					Integer count = 0; 
-					if (itemsPerAttribute.get(j).equals(item)) {
+					if (articlesPerAttribute.get(j).equals(article)) {
 						count++;
 					}
 					if(count != 1)
 						doeswork = false;
 						*/
-					if (itemsPerAttribute.get(j).getArticleNo() == "501")
-						assertThat(article, is(sameInstance(itemsPerAttribute.get(j))));
+					if (articlesPerAttribute.get(j).getArticleNo() == "501")
+						assertThat(article, is(sameInstance(articlesPerAttribute.get(j))));
 				}
 			}
 		}
 		
-		LOGGER.debug("ENDE findItemVorhanden");
+		LOGGER.debug("ENDE findarticleVorhanden");
 	}
 	
 	@Test
-	public void findItemByFaultId() throws ArticleNotFoundException{
+	public void findarticleByFaultId() throws ArticleNotFoundException{
 		thrown.expect(ArticleNotFoundException.class);
 		@SuppressWarnings("unused")
 		Article article = am.findArticleByArticleNo("-1");
