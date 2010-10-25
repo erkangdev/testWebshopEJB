@@ -112,7 +112,7 @@ public class ArticleManagementTest {
 				// hole zu jedem attribute alle articles
 				List <Article> articlesPerAttribute = attributes.get(i).getArticles();
 				
-				// article(501).Attribute.articles.containarticleWithID(501)
+				// article(VZ90/10).Attribute.articles.containarticleWithID(VZ90/10)
 				for (int j = 0; j <articlesPerAttribute.size(); j++) {
 					// Umstaendlich TODO: Weg wenn andere methode funktioniert:
 					// ueberpruefe ob bei jedem attribute genau ein article 
