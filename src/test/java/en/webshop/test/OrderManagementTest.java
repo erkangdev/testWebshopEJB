@@ -98,12 +98,8 @@ public class OrderManagementTest {
 	@Test
 	public void findOrderByFaultId() throws OrderNotFoundException{
 		thrown.expect(OrderNotFoundException.class);
-		try {
-			Order order = om.findOrderByOrderId(new Long(-1), LOCALE);
-			fail();
-		} catch (InvalidOrderIdException e) {
-			LOGGER.error("findOrderByFaultId: InvalidOrderIdException " + e.getStackTrace());
-		}		
+		Order order = om.findOrderByOrderId(new Long(-1), LOCALE);
+
 		
 	}
 	
