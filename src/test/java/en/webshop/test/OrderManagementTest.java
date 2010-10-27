@@ -134,7 +134,7 @@ public class OrderManagementTest {
 		Order order = orders.get(1);
 		Long orderId = order.getId();
 		
-		
+		// hallo
 		List<OrderPosition> orderPositions = om.findOrderPositions(orderId);
 		int countLineItems = orderPositions.size();
 
