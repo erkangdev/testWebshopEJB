@@ -38,6 +38,7 @@ import en.webshop.orderManagement.domain.Order;
 import en.webshop.orderManagement.service.InvalidOrderIdException;
 import en.webshop.orderManagement.service.OrderDuplicateException;
 import en.webshop.orderManagement.service.OrderManagement;
+import en.webshop.orderManagement.service.OrderPositionNotFoundException;
 import en.webshop.orderManagement.service.OrderValidationException;
 import en.webshop.profileManagement.service.ProfileNotFoundException;
 import en.webshop.profileManagement.domain.Profile;
@@ -126,7 +127,7 @@ public class OrderManagementTest {
 
 	@Test
 	public void addLineItemToOrder() 
-			throws ProfileNotFoundException, OrderDuplicateException, OrderValidationException, ArticleNotFoundException, InvalidEmailException, OrderNotFoundException {
+			throws ProfileNotFoundException, OrderDuplicateException, OrderValidationException, ArticleNotFoundException, InvalidEmailException, OrderNotFoundException, OrderPositionNotFoundException {
 	
 		final String 	profileEmail 	= PROFILE_EMAIL_EXISTENT; 	// "max@hs-karlsruhe.de"
 		final String 	item1Id 	= ITEM_1_ID; 			// "500"
@@ -138,7 +139,7 @@ public class OrderManagementTest {
 		Long orderId = order.getId();
 		
 		
-		List<OrderPosition> orderPositions = ((OrderManagement) om).findOrderPositions(orderId);
+		List<OrderPosition> orderPositions = om.findOrderPositions(orderId);
 		int countLineItems = orderPositions.size();
 
 		OrderPosition orderPosition = new OrderPosition(article); 
