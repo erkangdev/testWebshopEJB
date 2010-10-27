@@ -13,10 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.ejb.EJB;
 import javax.inject.Inject;
 
 import org.dbunit.DatabaseUnitException;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.security.client.SecurityClient;
+import org.jboss.security.client.SecurityClientFactory;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,6 +44,7 @@ import en.webshop.profileManagement.domain.Profile;
 import en.webshop.profileManagement.service.InvalidEmailException;
 import en.webshop.profileManagement.service.ProfileManagement;
 import en.webshop.test.util.DbReload;
+import en.webshop.test.util.DbReloadProvider;
 
 @RunWith(Arquillian.class)
 public class OrderManagementTest {
@@ -51,22 +55,40 @@ public class OrderManagementTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 	
-	@Inject
+	private static SecurityClient securityClient;
+	
+	@EJB
 	private OrderManagement om;
 	
-	@Inject
+	@EJB
 	private ProfileManagement pm;
 	
-	@Inject
+	@EJB
 	private ArticleManagement am;
 	
-	private static final Integer PROFILE_ID_EXISTENT = 501; // Integer.valueOf(501); ?
+	private static final String PROFILE_ID_EXISTENT = "501"; // Integer.valueOf(501); ?
 	private static final String PROFILE_EMAIL_EXISTENT = "max@hs-karlsruhe.de";
 	private static final Integer ORDER_ID_EXISTENT = 700;
 	private static final String ITEM_1_ID = "500";
 	private static final short ITEM_1_AMOUNT = 1;
-	private static final Integer ITEM_2_ID = 501;
+	private static final String ITEM_2_ID = "501";
 	private static final short ITEM_2_AMOUNT = 2;
+	
+	/**
+	 */
+	@BeforeClass
+	public static void init() {
+		try {
+			DbReloadProvider.reload();
+			securityClient = SecurityClientFactory.getSecurityClient();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		
+		assertThat(securityClient, is(notNullValue()));
+	}
 	
 	/**
 	 * Dieser Test sollte fehlschlagen?
@@ -129,11 +151,11 @@ public class OrderManagementTest {
 	
 	@SuppressWarnings("unchecked")
 	@Test
-	public void createOrder() throws ProfileNotFoundException, OrderDuplicateException, OrderValidationException, ItemNotFoundException, InvalidProfileIdException {
-		final Integer 	profileId 	= PROFILE_ID_EXISTENT; 	//501
+	public void createOrder() throws ProfileNotFoundException, OrderDuplicateException, OrderValidationException, ArticleNotFoundException, InvalidEmailException {
+		final String 	profileId 	= PROFILE_ID_EXISTENT; 	//501
 		final String 	item1Id 	= ITEM_1_ID; 			//500
 		final short 	item1Amount = ITEM_1_AMOUNT; 		//1
-		final Integer 	item2Id 	= ITEM_2_ID; 			//501
+		final String 	item2Id 	= ITEM_2_ID; 			//501
 		final short 	item2Amount = ITEM_2_AMOUNT; 		//2
 		
 		Order order = new Order();
@@ -143,33 +165,28 @@ public class OrderManagementTest {
 		Article article = am.findArticleByArticleNo(item1Id);
 		OrderPosition pos = new OrderPosition(article);
 		pos.setQuantity(item1Amount);
-		order.getLineItems().add(pos);
+		order.getOrderPositions().add(pos);
 		pos.setOrder(order);
 		
 		
-		article = am.findItemById(item2Id);
-		pos = new LineItem(article);
-		pos.setAmount(item2Amount);
-		order.getLineItems().add(pos);
+		article = am.findArticleByArticleNo(item2Id);
+		pos = new OrderPosition(article);
+		pos.setQuantity(item2Amount);
+		order.getOrderPositions().add(pos);
 		pos.setOrder(order);
 
-		// Profile profile = pm.findProfileById(profileId, LOCALE);
-		Profile profile = pm.findProfileWithOrdersById(profileId, LOCALE);
-		order.setProfile(profile);
+		Profile profile = pm.findProfileByEmail(profileId, LOCALE);
+		order.setCustomer(profile);
 		profile.getOrders().add(order);
 		
 		order = om.createOrder(order, Locale.getDefault(), false);
-		assertThat(order.getLineItems().size(), is(2));
-		for (LineItem li: order.getLineItems()) {
-			assertThat(li.getItem().getItemId(), anyOf(is(item1Id), is(item2Id)));
+		assertThat(order.getOrderPositions().size(), is(2));
+		for (OrderPosition li: order.getOrderPositions()) {
+			assertThat(li.getArticle().getArticleNo(), anyOf(is(item1Id), is(item2Id)));
 		}
 			
-		profile = order.getProfile();
-		assertThat(profile.getProfileId(), is(profileId));
+		profile = order.getCustomer();
+		assertThat(profile.getEmail(), is(profileId));
 	}
 	
-	@BeforeClass
-	public static void reloadDB() throws SQLException, DatabaseUnitException, ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
-		DbReload.reload();
-	}
 }
