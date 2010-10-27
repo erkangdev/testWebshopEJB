@@ -37,7 +37,6 @@ public abstract class ArchiveUtil {
 		ejbJar.as(ExplodedImporter.class).importDirectory(EJB_DIR);
 		// Testklassen mitverpacken, damit sie im JBoss aufgerufen werden
 		ejbJar.addPackage(ProfileManagementTest.class.getPackage());
-		ejbJar.addPackage(ArticleManagementTest.class.getPackage());
 		// Die Hilfsklassen DbReloadProvider und DbReload werden in den JUnit-Tests aufgerufen und
 		// muessen deshalb mitverpackt werden
 		ejbJar.addClasses(DbReloadProvider.class, DbReload.class);
