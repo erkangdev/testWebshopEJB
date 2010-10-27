@@ -95,13 +95,12 @@ public class OrderManagementTest {
 	 * Dieser Test sollte fehlschlagen?
 	 * TODO comment bearbeiten
 	 * @throws OrderNotFoundException
+	 * @throws InvalidOrderIdException 
 	 */
 	@Test
-	public void findOrderByFaultId() throws OrderNotFoundException{
+	public void findOrderByFaultId() throws OrderNotFoundException, InvalidOrderIdException{
 		thrown.expect(OrderNotFoundException.class);
 		Order order = om.findOrderByOrderId(new Long(-1), LOCALE);
-
-		
 	}
 	
 	/*@Test
