@@ -8,15 +8,11 @@ import static org.junit.Assert.fail;
 import static org.junit.matchers.JUnitMatchers.both;
 import static org.junit.matchers.JUnitMatchers.either;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Locale;
 
 import javax.ejb.EJB;
-import javax.inject.Inject;
 
-import org.dbunit.DatabaseUnitException;
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.security.client.SecurityClient;
@@ -25,24 +21,22 @@ import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.internal.matchers.CombinableMatcher;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import en.webshop.profileManagement.service.ProfileNotFoundException;
 import en.webshop.profileManagement.domain.Profile;
 import en.webshop.profileManagement.service.InvalidEmailException;
 import en.webshop.profileManagement.service.InvalidLastNameException;
-import en.webshop.profileManagement.service.InvalidEmailException;
+import en.webshop.profileManagement.service.ProfileDeleteArticleException;
 import en.webshop.profileManagement.service.ProfileDeleteOrderException;
 import en.webshop.profileManagement.service.ProfileDuplicateException;
 import en.webshop.profileManagement.service.ProfileManagement;
+import en.webshop.profileManagement.service.ProfileNotFoundException;
 import en.webshop.profileManagement.service.ProfileValidationException;
 import en.webshop.profileManagement.service.StatusAlreadySetException;
 import en.webshop.test.util.ArchiveUtil;
-import en.webshop.test.util.DbReload;
 import en.webshop.test.util.DbReloadProvider;
 
 
@@ -63,28 +57,26 @@ public class ProfileManagementTest {
 	@EJB
 	private ProfileManagement pm;
 	
-	private static final char PROFILE_ROLE_CUSTOMER = 'C';
-	private static final char PROFILE_ROLE_VENDOR = 'V';
-	private static final char PROFILE_ROLE_ADMIN = 'A';
-	private static final char PROFILE_STATUS = 'A';
+	private static final int PROFILE_ROLE_CUSTOMER = 1;
+	private static final int PROFILE_ROLE_SUPPLIER = 2;
+	private static final int PROFILE_ROLE_ADMIN = 0;
+	private static final int PROFILE_STATUS_ACTIVATED = 0;
+	private static final int PROFILE_STATUS_DEACTIVATED = 1;
 	private static final String PROFILE_LAST_NAME_AVAILABLE = "Mustermann";
 	private static final String PROFILE_LAST_NAME_UNAVAILABLE = "Unavailable";
 	private static final String PROFILE_LAST_NAME_INVALID = "?";
-	private static final Integer PROFILE_ID_AVAILABLE = Integer.valueOf(501);
-	private static final Integer PROFILE_ID_INVALID = Integer.valueOf(-1);
-	private static final Integer PROFILE_ID_WITHOUT_ORDERS = 503;
-	private static final Integer PROFILE_ID_WITH_ADDRESS = 500;
-	private static final String ADDRESS_NAME_EXISTANT = "Metall AG";
+	private static final String PROFILE_EMAIL_AVAILABLE = "max@hs-karlsruhe.de";
+	private static final String PROFILE_EMAIL_INVALID = "mail@invalid.de";
+	private static final String PROFILE_EMAIL_WITHOUT_ORDERS = "oliver.kahn@fc-bayern.de";
 	private static final String PROFILE_EMAIL_UNAVAILABLE = "unavailable@hs-karlsruhe.de";
-	private static final String PROFILE_NEW_LAST_NAME = "Neu";
-	private static final String PROFILE_NEW_EMAIL = "neu@hs-karlsruhe.de";
+	private static final String PROFILE_NEW_LAST_NAME = "New Name";
+	private static final String PROFILE_NEW_EMAIL = "new@hs-karlsruhe.de";
 	private static final String PROFILE_NEW_TELEPHONE_NO = "1234/567890";
-	private static final String ADDRESS_NEW_NAME = "New Address";
-	private static final String ADDRESS_NEW_ROAD = "New-Road";
-	private static final String ADDRESS_NEW_HOUSE_NO = "99";
-	private static final String ADDRESS_NEW_ZIP_CODE = "88888";
-	private static final String ADDRESS_NEW_CITY = "New City";
-	private static final char ADDRESS_STATUS = 'A';
+	private static final String PROFILE_ADDR_NEW_NAME = "New Address";
+	private static final String PROFILE_ADDR_NEW_STREET = "New Street";
+	private static final String PROFILE_ADDR_NEW_HOUSE_NO = "99";
+	private static final String PROFILE_ADDR_NEW_POST_CODE = "88888";
+	private static final String PROFILE_ADDR_NEW_CITY = "New City";
 	
 	/**
 	 */
@@ -120,9 +112,7 @@ public class ProfileManagementTest {
 
 		for (Profile p: profiles) {
 			assertThat(p.getLastName(), is(lastName));
-			assertThat(3, either(matches(is(String.class))).or( 
-                    matches(is(Integer.class)))); 
-			assertThat(p.getRole(), either(is(PROFILE_ROLE_CUSTOMER)).or(is(PROFILE_ROLE_VENDOR)).or(is(PROFILE_ROLE_ADMIN)));
+			assertThat(p.getRole(), either(is(PROFILE_ROLE_CUSTOMER)).or(is(PROFILE_ROLE_SUPPLIER)).or(is(PROFILE_ROLE_ADMIN)));
 			
 			// Nur zur Veranschaulichung von both().and()
 			// Wenn Gleichheit mit einem anderen Namen, dann ja auch != null ...
@@ -166,13 +156,13 @@ public class ProfileManagementTest {
 	}
 
 	@Test
-	public void findProfileWithInvalidProfileId() throws ProfileNotFoundException, InvalidProfileIdException {
-		final Integer profileId = PROFILE_ID_INVALID;
+	public void findProfileWithInvalidProfileId() throws ProfileNotFoundException, InvalidEmailException {
+		final String email = PROFILE_EMAIL_INVALID;
 
-		thrown.expect(InvalidProfileIdException.class);
-		thrown.expectMessage(profileId.toString());
+		thrown.expect(InvalidEmailException.class);
+		thrown.expectMessage(email);
 		
-		pm.findProfileById(profileId, LOCALE);
+		pm.findProfileByEmail(email, LOCALE);
 	}
 
 	@Test // error
@@ -180,14 +170,13 @@ public class ProfileManagementTest {
 		final String lastName = PROFILE_NEW_LAST_NAME;
 		final String email = PROFILE_NEW_EMAIL;
 		final String telephoneNo = PROFILE_NEW_TELEPHONE_NO;
-		final char role = PROFILE_ROLE_CUSTOMER;
-		final char pStatus = PROFILE_STATUS;
-		final String name = ADDRESS_NEW_NAME;
-		final String road = ADDRESS_NEW_ROAD;
-		final String houseNo = ADDRESS_NEW_HOUSE_NO;
-		final String zipCode = ADDRESS_NEW_ZIP_CODE;
-		final String city = ADDRESS_NEW_CITY;
-		final char aStatus = ADDRESS_STATUS;
+		final int role = PROFILE_ROLE_CUSTOMER;
+		final int status = PROFILE_STATUS_ACTIVATED;
+		final String name = PROFILE_ADDR_NEW_NAME;
+		final String street = PROFILE_ADDR_NEW_STREET;
+		final String houseNo = PROFILE_ADDR_NEW_HOUSE_NO;
+		final String postcode = PROFILE_ADDR_NEW_POST_CODE;
+		final String city = PROFILE_ADDR_NEW_CITY;
 		
 		final Profile newProfile = new Profile();
 		
@@ -195,18 +184,23 @@ public class ProfileManagementTest {
 		newProfile.setEmail(email);
 		newProfile.setTelephoneNo(telephoneNo);
 		newProfile.setRole(role);
-		newProfile.setStatus(pStatus);
+		newProfile.setStatus(status);
+		newProfile.setAddrName(name);
+		newProfile.setAddrStreet(street);
+		newProfile.setAddrHouseNo(houseNo);
+		newProfile.setAddrPostcode(postcode);
+		newProfile.setAddrCity(city);
 		
 		pm.createProfile(newProfile, LOCALE, false);
 		assertThat(newProfile, is(notNullValue()));
 	}
 	
 	@Test
-	public void updateProfile() throws ProfileNotFoundException, InvalidProfileIdException
+	public void updateProfile() throws ProfileNotFoundException, InvalidEmailException
 	{
-		final Integer profileId = PROFILE_ID_AVAILABLE;
+		final String email = PROFILE_EMAIL_AVAILABLE;
 		final String newLastName = PROFILE_LAST_NAME_UNAVAILABLE;
-		final Profile profile = pm.findProfileById(profileId, LOCALE);
+		final Profile profile = pm.findProfileByEmail(email, LOCALE);
 		
 		final String oldLastName = profile.getLastName();
 		profile.setLastName(newLastName);
@@ -216,41 +210,35 @@ public class ProfileManagementTest {
 
 	@Test
 	public void deleteProfile()
-		   throws ProfileDeleteOrderException, ProfileNotFoundException, InvalidProfileIdException, ProfileValidationException, ProfileDuplikatException {
-		final Integer profileId = PROFILE_ID_WITHOUT_ORDERS;
+		   throws ProfileDeleteOrderException, ProfileNotFoundException, InvalidEmailException, ProfileValidationException, ProfileDuplicateException, ProfileDeleteArticleException {
+		final String email = PROFILE_EMAIL_WITHOUT_ORDERS;
 		
-		final Collection<Profile> profilePre = pm.findAllProfiles(PROFILE_ROLE_CUSTOMER);
+		final Collection<Profile> profilePre = pm.findAllProfilesByRole(PROFILE_ROLE_CUSTOMER);
 	
-		final Profile profile = pm.findProfileWithOrdersById(profileId, LOCALE);
+		final Profile profile = pm.findProfileByEmail(email, LOCALE);
 		LOGGER.debug("profilelog: " + profile);
 		assertThat(profile, is(notNullValue()));
 		assertThat(profile.getOrders().isEmpty(), is(true));
 		
 		pm.deleteProfile(profile);
 		
-		final Collection<Profile> profilePost = pm.findAllProfiles(PROFILE_ROLE_CUSTOMER);
+		final Collection<Profile> profilePost = pm.findAllProfilesByRole(PROFILE_ROLE_CUSTOMER);
 		assertThat(profilePre.size()-1, is(profilePost.size()));
 	}
 	
 	@Test
-	public void deactivateProfile() throws ProfileNotFoundException, InvalidProfileIdException, 
-			InvalidEmailException, StatusIsAlreadySetException {
-		final String email = PROFILE_NEW_EMAIL;
+	public void deactivateProfile() throws ProfileNotFoundException, InvalidEmailException, 
+			InvalidEmailException, StatusAlreadySetException {
+		final int deactivated = PROFILE_STATUS_DEACTIVATED;
+		final String email = PROFILE_EMAIL_AVAILABLE;
+		final Profile profile = pm.findProfileByEmail(email, LOCALE);
 	
 		final Profile profileBefore = pm.findProfileByEmail(email, LOCALE);
 		assertThat(profileBefore, is(notNullValue()));
 		
-		pm.deactivateProfile(profileBefore.getProfileId());
+		pm.setProfileStatus(profile, deactivated);
 	
 		final Profile profileAfter = pm.findProfileByEmail(email, LOCALE);
-		assertThat(profileAfter.getStatus(), is(PARAM_DEACTIVATE_PROFILE));
+		assertThat(profileAfter.getStatus(), is(PROFILE_STATUS_DEACTIVATED));
 	}
-	@Test
-	public void showAddressForProfile() throws ProfileNotFoundException, InvalidProfileIdException
-	{
-		final Integer profileId = PROFILE_ID_WITH_ADDRESS;
-		final Profile profile = pm.findProfileById(profileId, LOCALE);
-		assertThat(profile.getAddress().getName(), is(ADDRESS_NAME_EXISTANT));
-	}
-	
 }
