@@ -7,16 +7,12 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import javax.ejb.EJB;
-import javax.inject.Inject;
 
-import org.dbunit.DatabaseUnitException;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.security.client.SecurityClient;
 import org.jboss.security.client.SecurityClientFactory;
@@ -25,31 +21,26 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import en.webshop.articleManagement.service.ArticleManagement;
-import en.webshop.articleManagement.service.ArticleNotFoundException;
 import en.webshop.articleManagement.domain.Article;
 import en.webshop.articleManagement.service.ArticleManagement;
-import en.webshop.orderManagement.service.OrderNotFoundException;
-import en.webshop.orderManagement.domain.OrderPosition;
+import en.webshop.articleManagement.service.ArticleNotFoundException;
 import en.webshop.orderManagement.domain.Order;
+import en.webshop.orderManagement.domain.OrderPosition;
 import en.webshop.orderManagement.service.InvalidOrderIdException;
 import en.webshop.orderManagement.service.OrderDuplicateException;
 import en.webshop.orderManagement.service.OrderManagement;
+import en.webshop.orderManagement.service.OrderNotFoundException;
 import en.webshop.orderManagement.service.OrderPositionNotFoundException;
 import en.webshop.orderManagement.service.OrderValidationException;
-import en.webshop.profileManagement.service.ProfileNotFoundException;
 import en.webshop.profileManagement.domain.Profile;
 import en.webshop.profileManagement.service.InvalidEmailException;
 import en.webshop.profileManagement.service.ProfileManagement;
-import en.webshop.test.util.DbReload;
+import en.webshop.profileManagement.service.ProfileNotFoundException;
 import en.webshop.test.util.DbReloadProvider;
 
 @RunWith(Arquillian.class)
 public class OrderManagementTest {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ArticleManagementTest.class);
 	
 	private static final Locale LOCALE = Locale.GERMAN;
 	
@@ -69,7 +60,7 @@ public class OrderManagementTest {
 	
 	private static final String PROFILE_ID_EXISTENT = "501"; // Integer.valueOf(501); ?
 	private static final String PROFILE_EMAIL_EXISTENT = "max@hs-karlsruhe.de";
-	private static final Integer ORDER_ID_EXISTENT = 700;
+	//private static final Integer ORDER_ID_EXISTENT = 700;
 	private static final String ITEM_1_ID = "500";
 	private static final short ITEM_1_AMOUNT = 1;
 	private static final String ITEM_2_ID = "501";
@@ -100,6 +91,7 @@ public class OrderManagementTest {
 	@Test
 	public void findOrderByFaultId() throws OrderNotFoundException, InvalidOrderIdException{
 		thrown.expect(OrderNotFoundException.class);
+		@SuppressWarnings("unused")
 		Order order = om.findOrderByOrderId(new Long(-1), LOCALE);
 	}
 	

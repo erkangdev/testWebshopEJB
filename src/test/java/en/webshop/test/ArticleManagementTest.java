@@ -6,27 +6,21 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 
 import javax.ejb.EJB;
-import javax.security.auth.login.LoginException;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.security.client.SecurityClient;
 import org.jboss.security.client.SecurityClientFactory;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import en.webshop.articleManagement.domain.Article;
 import en.webshop.articleManagement.domain.Attribute;
@@ -41,9 +35,6 @@ import en.webshop.test.util.DbReloadProvider;
 
 @RunWith(Arquillian.class)
 public class ArticleManagementTest {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ArticleManagementTest.class);
-	
-	private static final Locale LOCALE = Locale.GERMAN;
 	
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -53,9 +44,6 @@ public class ArticleManagementTest {
 	private static final String ARTICLE_NO_AVAILABLE = "VZ90/10";
 	private static final String CATEGORY_NAME_AVAILABLE = "Dimension";
 	private static final String ATTRIBUTE_NAME_AVAILABLE = "Holz";
-	
-	private static final String CONCURRENT_UPDATE = "update";
-	private static final String CONCURRENT_DELETE = "delete";
 	
 	@EJB
 	private ArticleManagement am;
@@ -87,7 +75,6 @@ public class ArticleManagementTest {
 	
 	@Test
 	public void findArticleVorhanden() throws ArticleNotFoundException {
-		LOGGER.debug("BEGINN findArticleVorhanden");
 		
 		// ArticleNo VZ90/10
 		final String articleNo = ARTICLE_NO_AVAILABLE;
@@ -131,7 +118,6 @@ public class ArticleManagementTest {
 			}
 		}
 		
-		LOGGER.debug("ENDE findarticleVorhanden");
 	}
 	
 	@Test

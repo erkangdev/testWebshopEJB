@@ -51,9 +51,6 @@ public class ProfileManagementTest {
 	
 	private static SecurityClient securityClient;
 	
-	private static final String CONCURRENT_UPDATE = "update";
-	private static final String CONCURRENT_DELETE = "delete";
-	
 	@EJB
 	private ProfileManagement pm;
 	
