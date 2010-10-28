@@ -7,7 +7,6 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import en.webshop.test.ArticleManagementTest;
 import en.webshop.test.ProfileManagementTest;
 
 
