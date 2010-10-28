@@ -13,9 +13,11 @@ import java.util.Locale;
 
 import javax.ejb.EJB;
 
+import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.security.client.SecurityClient;
 import org.jboss.security.client.SecurityClientFactory;
+import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,6 +39,7 @@ import en.webshop.profileManagement.domain.Profile;
 import en.webshop.profileManagement.service.InvalidEmailException;
 import en.webshop.profileManagement.service.ProfileManagement;
 import en.webshop.profileManagement.service.ProfileNotFoundException;
+import en.webshop.test.util.ArchiveUtil;
 import en.webshop.test.util.DbReloadProvider;
 
 @RunWith(Arquillian.class)
@@ -65,6 +68,13 @@ public class OrderManagementTest {
 	private static final short ITEM_1_AMOUNT = 1;
 	private static final String ITEM_2_ID = "501";
 	private static final short ITEM_2_AMOUNT = 2;
+	
+	/**
+	 */
+	@Deployment
+	public static EnterpriseArchive createTestArchive() {
+		return ArchiveUtil.getTestArchive();
+	}
 	
 	/**
 	 */
