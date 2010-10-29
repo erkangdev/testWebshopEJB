@@ -49,7 +49,7 @@ public class ArticleManagementTest {
 	private static final String CATEGORY_NAME_AVAILABLE = "Dimension";
 	private static final String ATTRIBUTE_NAME_AVAILABLE = "Holz";
 	
-	private static final String USERNAME = "mario-gomez@hs-karlsruhe.de";
+	private static final String USERNAME = "rd@sc.de";
 	private static final String PASSWORD = "pass";
 	
 	@EJB

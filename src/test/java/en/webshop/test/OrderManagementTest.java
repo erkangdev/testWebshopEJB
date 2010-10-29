@@ -73,7 +73,7 @@ public class OrderManagementTest {
 	private static final String ITEM_2_ID = "501";
 	private static final short ITEM_2_AMOUNT = 2;
 	
-	private static final String USERNAME = "mario-gomez@hs-karlsruhe.de";
+	private static final String USERNAME = "rd@sc.de";
 	private static final String PASSWORD = "pass";
 	
 	/**

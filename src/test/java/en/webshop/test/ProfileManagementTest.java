@@ -79,7 +79,7 @@ public class ProfileManagementTest {
 	private static final String PROFILE_ADDR_NEW_POST_CODE = "88888";
 	private static final String PROFILE_ADDR_NEW_CITY = "New City";
 	
-	private static final String USERNAME = "mario-gomez@hs-karlsruhe.de";
+	private static final String USERNAME = "rd@sc.de";
 	private static final String PASSWORD = "pass";
 	
 	/**
