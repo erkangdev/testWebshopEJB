@@ -95,6 +95,7 @@ public class ArticleManagementTest {
 	
 	@Test
 	public void findArticleVorhanden() throws ArticleNotFoundException {
+		
 		// ArticleNo VZ90/10
 		final String articleNo = ARTICLE_NO_AVAILABLE;
 		
