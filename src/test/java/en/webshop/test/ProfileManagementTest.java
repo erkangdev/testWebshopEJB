@@ -8,16 +8,20 @@ import static org.junit.Assert.fail;
 import static org.junit.matchers.JUnitMatchers.both;
 import static org.junit.matchers.JUnitMatchers.either;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Locale;
 
 import javax.ejb.EJB;
+import javax.security.auth.login.LoginException;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.security.client.SecurityClient;
 import org.jboss.security.client.SecurityClientFactory;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -75,6 +79,9 @@ public class ProfileManagementTest {
 	private static final String PROFILE_ADDR_NEW_POST_CODE = "88888";
 	private static final String PROFILE_ADDR_NEW_CITY = "New City";
 	
+	private static final String USERNAME = "mario-gomez@hs-karlsruhe.de";
+	private static final String PASSWORD = "pass";
+	
 	/**
 	 */
 	@Deployment
@@ -96,6 +103,21 @@ public class ProfileManagementTest {
 		}
 		
 		assertThat(securityClient, is(notNullValue()));
+	}
+	
+	/**
+	 */
+	@Before
+	public void login() throws SQLException, LoginException {
+		securityClient.setSimple(USERNAME, PASSWORD);
+		securityClient.login();
+	}
+	
+	/**
+	 */
+	@After
+	public void logoutClient() {
+		securityClient.logout();
 	}
 	
 	@SuppressWarnings("unchecked")

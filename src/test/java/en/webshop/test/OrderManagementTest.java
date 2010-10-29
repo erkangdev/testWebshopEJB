@@ -7,17 +7,21 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import javax.ejb.EJB;
+import javax.security.auth.login.LoginException;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.security.client.SecurityClient;
 import org.jboss.security.client.SecurityClientFactory;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -69,6 +73,9 @@ public class OrderManagementTest {
 	private static final String ITEM_2_ID = "501";
 	private static final short ITEM_2_AMOUNT = 2;
 	
+	private static final String USERNAME = "mario-gomez@hs-karlsruhe.de";
+	private static final String PASSWORD = "pass";
+	
 	/**
 	 */
 	@Deployment
@@ -93,10 +100,21 @@ public class OrderManagementTest {
 	}
 	
 	/**
-	 * Dieser Test sollte fehlschlagen?
-	 * TODO comment bearbeiten
-	 * @throws OrderNotFoundException
-	 * @throws InvalidOrderIdException 
+	 */
+	@Before
+	public void login() throws SQLException, LoginException {
+		securityClient.setSimple(USERNAME, PASSWORD);
+		securityClient.login();
+	}
+	
+	/**
+	 */
+	@After
+	public void logoutClient() {
+		securityClient.logout();
+	}
+	
+	/**
 	 */
 	@Test
 	public void findOrderByFaultId() throws OrderNotFoundException, InvalidOrderIdException{
@@ -135,7 +153,6 @@ public class OrderManagementTest {
 		Order order = orders.get(1);
 		Long orderId = order.getId();
 		
-		// hallo
 		List<OrderPosition> orderPositions = om.findOrderPositions(orderId);
 		int countLineItems = orderPositions.size();
 

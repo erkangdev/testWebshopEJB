@@ -6,16 +6,20 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
 import javax.ejb.EJB;
+import javax.security.auth.login.LoginException;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.security.client.SecurityClient;
 import org.jboss.security.client.SecurityClientFactory;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,6 +49,9 @@ public class ArticleManagementTest {
 	private static final String CATEGORY_NAME_AVAILABLE = "Dimension";
 	private static final String ATTRIBUTE_NAME_AVAILABLE = "Holz";
 	
+	private static final String USERNAME = "mario-gomez@hs-karlsruhe.de";
+	private static final String PASSWORD = "pass";
+	
 	@EJB
 	private ArticleManagement am;
 	
@@ -71,11 +78,23 @@ public class ArticleManagementTest {
 		assertThat(securityClient, is(notNullValue()));
 	}
 	
-	// TODO login
+	/**
+	 */
+	@Before
+	public void login() throws SQLException, LoginException {
+		securityClient.setSimple(USERNAME, PASSWORD);
+		securityClient.login();
+	}
+	
+	/**
+	 */
+	@After
+	public void logoutClient() {
+		securityClient.logout();
+	}
 	
 	@Test
 	public void findArticleVorhanden() throws ArticleNotFoundException {
-		
 		// ArticleNo VZ90/10
 		final String articleNo = ARTICLE_NO_AVAILABLE;
 		
@@ -117,7 +136,6 @@ public class ArticleManagementTest {
 				}
 			}
 		}
-		
 	}
 	
 	@Test
@@ -128,13 +146,13 @@ public class ArticleManagementTest {
 	}
 	
 	@Test
-	public void findCategoriesAvailable() throws CategoryNotFoundException {
+	public void findCategoriesAvailable() throws CategoryNotFoundException {		
 		final Collection<Category> categories = am.findAllCategories();
 		assertThat(categories.isEmpty(),is(false));
 	}
 	
 	@Test
-	public void findCategoriesByName() throws CategoryNotFoundException {
+	public void findCategoriesByName() throws CategoryNotFoundException {		
 		final String catname = CATEGORY_NAME_AVAILABLE;
 		final Collection<Category> categories = am.findCategoriesByName(catname);
 		assertThat(categories.isEmpty(),is(false));
