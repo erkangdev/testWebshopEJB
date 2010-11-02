@@ -35,10 +35,14 @@ import en.webshop.articleManagement.service.AttributeNotFoundException;
 import en.webshop.articleManagement.service.CategoryNotFoundException;
 import en.webshop.test.util.ArchiveUtil;
 import en.webshop.test.util.DbReloadProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @RunWith(Arquillian.class)
 public class ArticleManagementTest {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(ArticleManagementTest.class);
 	
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -93,18 +97,30 @@ public class ArticleManagementTest {
 		securityClient.logout();
 	}
 	
+	// TODO: Test Fehlerhaft
+	/**
+	 * org.hibernate.LazyInitializationException: 
+	 * failed to lazily initialize a collection of role: 
+	 * en.webshop.articleManagement.domain.Article.attributes, 
+	 * no session or session was closed
+	 */
 	@Test
 	public void findArticleVorhanden() throws ArticleNotFoundException {
-		
+		LOGGER.error("BEGINN findArticleVorhanden");
 		// ArticleNo VZ90/10
 		final String articleNo = ARTICLE_NO_AVAILABLE;
 		
+		LOGGER.error("BEGINN am.findArticleByArticleNo(articleNo)" + articleNo);
 		// Suche ein objekt anhand einer vorhandenen articleNo
 		final Article article = am.findArticleByArticleNo(articleNo);
 		
+		LOGGER.error("BEGINN article.getAttributes()");
 		// Speichere alle attribute des article objekts in attributes 
+		// TODO: bis hier her funktioniert es.
 		final List<Attribute> attributes = article.getAttributes();
+		//final List<Attribute> attributes = ((ArticleManagement) am).getAttributesbyArticle(article); 
 		
+		LOGGER.error("BEGINN attributes.isEmpty():" + attributes.isEmpty());
 		// Artikel VZ90/10 hat Attribute 5,12,14,?,
 		assertThat(attributes.isEmpty(),is(false));
 		
