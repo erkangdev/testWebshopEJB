@@ -65,13 +65,12 @@ public class OrderManagementTest {
 	@EJB
 	private ArticleManagement am;
 	
-	private static final String PROFILE_ID_EXISTENT = "501"; // Integer.valueOf(501); ?
 	private static final String PROFILE_EMAIL_EXISTENT = "max@hs-karlsruhe.de";
-	//private static final Integer ORDER_ID_EXISTENT = 700;
-	private static final String ITEM_1_ID = "500";
-	private static final short ITEM_1_AMOUNT = 1;
-	private static final String ITEM_2_ID = "501";
-	private static final short ITEM_2_AMOUNT = 2;
+	// private static final Integer ORDER_ID_EXISTENT = 700;
+	private static final String ARTICLE_NO_1 = "VZ90/10";
+	private static final short ARTICLE_AMOUNT_1 = 1;
+	private static final String ARTICLE_NO_2 = "VZ130/1011";
+	private static final short ARTICLE_AMOUNT_2 = 2;
 	
 	private static final String USERNAME = "rd@sc.de";
 	private static final String PASSWORD = "pass";
@@ -139,54 +138,50 @@ public class OrderManagementTest {
 		assertThat(orderList.size(), is(2));
 	}*/	
 
-
 	@Test
-	public void addLineItemToOrder() 
+	public void addOrderPositionToOrder() 
 			throws ProfileNotFoundException, OrderDuplicateException, OrderValidationException, ArticleNotFoundException, InvalidEmailException, OrderNotFoundException, OrderPositionNotFoundException {
 	
-		final String 	profileEmail 	= PROFILE_EMAIL_EXISTENT; 	// "max@hs-karlsruhe.de"
-		final String 	item1Id 	= ITEM_1_ID; 			// "500"
+		final String profileEmail = PROFILE_EMAIL_EXISTENT; 	// max@hs-karlsruhe.de
+		final String articleNo1 = ARTICLE_NO_1; 				// VZ90/10
 		
 		Profile profile = pm.findProfileByEmail(profileEmail, LOCALE);
-		Article article = am.findArticleByArticleNo(item1Id);
+		Article article = am.findArticleByArticleNo(articleNo1);
 		List<Order> orders = om.findOrdersByCustomer(profile);
 		Order order = orders.get(1);
 		Long orderId = order.getId();
 		
 		List<OrderPosition> orderPositions = om.findOrderPositions(orderId);
-		int countLineItems = orderPositions.size();
+		int countOrderPositions = orderPositions.size();
 
 		OrderPosition orderPosition = new OrderPosition(article); 
 		orderPositions.add(orderPosition);
 		
-		assertThat(orderPositions.size(), is(countLineItems+1));
-		
+		assertThat(orderPositions.size(), is(countOrderPositions+1));
 	}
-	
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void createOrder() throws ProfileNotFoundException, OrderDuplicateException, OrderValidationException, ArticleNotFoundException, InvalidEmailException {
-		final String 	profileId 	= PROFILE_ID_EXISTENT; 	//501
-		final String 	item1Id 	= ITEM_1_ID; 			//500
-		final short 	item1Amount = ITEM_1_AMOUNT; 		//1
-		final String 	item2Id 	= ITEM_2_ID; 			//501
-		final short 	item2Amount = ITEM_2_AMOUNT; 		//2
+		final String profileId = PROFILE_EMAIL_EXISTENT;
+		final String articleNo1 = ARTICLE_NO_1;				// VZ90/10
+		final short amount1 = ARTICLE_AMOUNT_1;				// 1
+		final String articleNo2 = ARTICLE_NO_2;				// VZ130/1011
+		final short amount2 = ARTICLE_AMOUNT_2;				// 2
 		
 		Order order = new Order();
 		final List<OrderPosition> orderPosition = new ArrayList<OrderPosition>(); 
 		order.setOrderPositions(orderPosition);
 		
-		Article article = am.findArticleByArticleNo(item1Id);
+		Article article = am.findArticleByArticleNo(articleNo1);
 		OrderPosition pos = new OrderPosition(article);
-		pos.setQuantity(item1Amount);
+		pos.setQuantity(amount1);
 		order.getOrderPositions().add(pos);
 		pos.setOrder(order);
 		
-		
-		article = am.findArticleByArticleNo(item2Id);
+		article = am.findArticleByArticleNo(articleNo2);
 		pos = new OrderPosition(article);
-		pos.setQuantity(item2Amount);
+		pos.setQuantity(amount2);
 		order.getOrderPositions().add(pos);
 		pos.setOrder(order);
 
@@ -197,11 +192,10 @@ public class OrderManagementTest {
 		order = om.createOrder(order, Locale.getDefault(), false);
 		assertThat(order.getOrderPositions().size(), is(2));
 		for (OrderPosition li: order.getOrderPositions()) {
-			assertThat(li.getArticle().getArticleNo(), anyOf(is(item1Id), is(item2Id)));
+			assertThat(li.getArticle().getArticleNo(), anyOf(is(articleNo1), is(articleNo2)));
 		}
 			
 		profile = order.getCustomer();
 		assertThat(profile.getEmail(), is(profileId));
 	}
-	
 }
