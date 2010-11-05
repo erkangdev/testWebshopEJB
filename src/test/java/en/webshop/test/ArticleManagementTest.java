@@ -117,8 +117,8 @@ public class ArticleManagementTest {
 		LOGGER.error("BEGINN article.getAttributes()");
 		// Speichere alle attribute des article objekts in attributes 
 		// TODO: bis hier her funktioniert es.
-		final List<Attribute> attributes = article.getAttributes();
-		//final List<Attribute> attributes = ((ArticleManagement) am).getAttributesbyArticle(article); 
+		//final List<Attribute> attributes = article.getAttributes();
+		final List<Attribute> attributes = am.getAttributesByArticle(article); 
 		
 		LOGGER.error("BEGINN attributes.isEmpty():" + attributes.isEmpty());
 		// Artikel VZ90/10 hat Attribute 5,12,14,?,
@@ -129,9 +129,10 @@ public class ArticleManagementTest {
 		{
 			// Falls irgendwo die Verbindung nicht passt wird die var false
 			// boolean doeswork = true;
-			
+			LOGGER.error("BEGINN attributes Details");
 			for (int i = 0; i < attributes.size(); i++) {
-
+				
+				LOGGER.error("BEGINN articlesPerAttribute Details");
 				// hole zu jedem attribute alle articles
 				List <Article> articlesPerAttribute = attributes.get(i).getArticles();
 				
