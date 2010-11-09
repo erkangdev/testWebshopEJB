@@ -67,10 +67,10 @@ public class ProfileManagementTest {
 	private static final String PROFILE_LAST_NAME_UNAVAILABLE = "Unavailable";
 	private static final String PROFILE_LAST_NAME_INVALID = "?";
 	private static final String PROFILE_EMAIL_AVAILABLE = "max@hs-karlsruhe.de";
-	private static final String PROFILE_EMAIL_INVALID = "mail@invalid.de";
+	private static final String PROFILE_EMAIL_INVALID = "mail/invalid.de";
 	private static final String PROFILE_EMAIL_WITHOUT_ORDERS = "oliver.kahn@fc-bayern.de";
 	private static final String PROFILE_EMAIL_UNAVAILABLE = "unavailable@hs-karlsruhe.de";
-	private static final String PROFILE_NEW_LAST_NAME = "New Name";
+	private static final String PROFILE_NEW_LAST_NAME = "Newname";
 	private static final String PROFILE_NEW_EMAIL = "new@hs-karlsruhe.de";
 	private static final String PROFILE_NEW_TELEPHONE_NO = "1234/567890";
 	private static final String PROFILE_ADDR_NEW_NAME = "New Address";
@@ -78,9 +78,13 @@ public class ProfileManagementTest {
 	private static final String PROFILE_ADDR_NEW_HOUSE_NO = "99";
 	private static final String PROFILE_ADDR_NEW_POST_CODE = "88888";
 	private static final String PROFILE_ADDR_NEW_CITY = "New City";
+	private static final String PROFILE_NEW_PASSWORD = "pass";
 	
 	private static final String USERNAME = "rd@sc.de";
 	private static final String PASSWORD = "pass";
+	
+	private static final String ADMIN_USERNAME = "admin@hs-karlsruhe.de";
+	private static final String ADMIN_PASSWORD = "pass";
 	
 	/**
 	 */
@@ -118,6 +122,12 @@ public class ProfileManagementTest {
 	@After
 	public void logoutClient() {
 		securityClient.logout();
+	}
+	
+	public void adminLogin() throws SQLException, LoginException {
+		securityClient.logout();
+		securityClient.setSimple(ADMIN_USERNAME, ADMIN_PASSWORD);
+		securityClient.login();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -175,7 +185,7 @@ public class ProfileManagementTest {
 	}
 
 	@Test
-	public void findProfileWithInvalidProfileId() throws ProfileNotFoundException, InvalidEmailException {
+	public void findProfileWithInvalidEmail() throws ProfileNotFoundException, InvalidEmailException {
 		final String email = PROFILE_EMAIL_INVALID;
 
 		thrown.expect(InvalidEmailException.class);
@@ -196,6 +206,7 @@ public class ProfileManagementTest {
 		final String houseNo = PROFILE_ADDR_NEW_HOUSE_NO;
 		final String postcode = PROFILE_ADDR_NEW_POST_CODE;
 		final String city = PROFILE_ADDR_NEW_CITY;
+		final String password = PROFILE_NEW_PASSWORD;
 		
 		final Profile newProfile = new Profile();
 		
@@ -209,6 +220,8 @@ public class ProfileManagementTest {
 		newProfile.setAddrHouseNo(houseNo);
 		newProfile.setAddrPostcode(postcode);
 		newProfile.setAddrCity(city);
+		newProfile.setPassword(password);
+		newProfile.setRepeatPassword(password);
 		
 		pm.createProfile(newProfile, LOCALE, false);
 		assertThat(newProfile, is(notNullValue()));
@@ -229,8 +242,12 @@ public class ProfileManagementTest {
 
 	@Test
 	public void deleteProfile()
-		   throws ProfileDeleteOrderException, ProfileNotFoundException, InvalidEmailException, ProfileValidationException, ProfileDuplicateException, ProfileDeleteArticleException {
+		   throws ProfileDeleteOrderException, ProfileNotFoundException, InvalidEmailException, 
+		   ProfileValidationException, ProfileDuplicateException, ProfileDeleteArticleException, 
+		   LoginException, SQLException {
 		final String email = PROFILE_EMAIL_WITHOUT_ORDERS;
+		
+		adminLogin();
 		
 		final Collection<Profile> profilePre = pm.findAllProfilesByRole(PROFILE_ROLE_CUSTOMER);
 	
