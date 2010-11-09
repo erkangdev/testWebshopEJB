@@ -35,10 +35,14 @@ import en.webshop.articleManagement.service.AttributeNotFoundException;
 import en.webshop.articleManagement.service.CategoryNotFoundException;
 import en.webshop.test.util.ArchiveUtil;
 import en.webshop.test.util.DbReloadProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @RunWith(Arquillian.class)
 public class ArticleManagementTest {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(ArticleManagementTest.class);
 	
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -93,18 +97,34 @@ public class ArticleManagementTest {
 		securityClient.logout();
 	}
 	
+	// TODO: Test Fehlerhaft
+	/**
+	 * org.hibernate.LazyInitializationException: 
+	 * failed to lazily initialize a collection of role: 
+	 * en.webshop.articleManagement.domain.Article.attributes, 
+	 * no session or session was closed
+	 */
 	@Test
 	public void findArticleVorhanden() throws ArticleNotFoundException {
-		
+		LOGGER.error("BEGINN findArticleVorhanden");
 		// ArticleNo VZ90/10
 		final String articleNo = ARTICLE_NO_AVAILABLE;
 		
+		LOGGER.error("BEGINN am.findArticleByArticleNo(articleNo)" + articleNo);
 		// Suche ein objekt anhand einer vorhandenen articleNo
-		final Article article = am.findArticleByArticleNo(articleNo);
+		Article article = am.findArticleByArticleNo(articleNo);
 		
+		assertThat(article == null, is(false));
+		
+		LOGGER.error("BEGINN article.getAttributes()");
 		// Speichere alle attribute des article objekts in attributes 
+		// TODO: bis hier her funktioniert es.
+		//article.getAttributes().size();
+		article = am.findArticleByArticleNoWithAttributes(articleNo);
+		article.getAttributes().size();
 		final List<Attribute> attributes = article.getAttributes();
 		
+		LOGGER.error("BEGINN attributes.isEmpty():" + attributes.isEmpty());
 		// Artikel VZ90/10 hat Attribute 5,12,14,?,
 		assertThat(attributes.isEmpty(),is(false));
 		
@@ -113,11 +133,14 @@ public class ArticleManagementTest {
 		{
 			// Falls irgendwo die Verbindung nicht passt wird die var false
 			// boolean doeswork = true;
-			
+			LOGGER.error("BEGINN attributes Details");
 			for (int i = 0; i < attributes.size(); i++) {
-
+				
+				LOGGER.error("BEGINN articlesPerAttribute Details");
 				// hole zu jedem attribute alle articles
-				List <Article> articlesPerAttribute = attributes.get(i).getArticles();
+				
+				Attribute attribute = am.findAttributeByIdWithArticles(attributes.get(i).getId());
+				List <Article> articlesPerAttribute = attribute.getArticles();
 				
 				// article(VZ90/10).Attribute.articles.containarticleWithID(VZ90/10)
 				for (int j = 0; j <articlesPerAttribute.size(); j++) {
