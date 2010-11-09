@@ -251,9 +251,11 @@ public class ProfileManagementTest {
 		
 		final Collection<Profile> profilePre = pm.findAllProfilesByRole(PROFILE_ROLE_CUSTOMER);
 	
-		final Profile profile = pm.findProfileByEmail(email, LOCALE);
+		Profile profile = pm.findProfileByEmail(email, LOCALE);
 		LOGGER.debug("profilelog: " + profile);
 		assertThat(profile, is(notNullValue()));
+		
+		profile = pm.findProfileWithOrdersByEmail(profile.getEmail(), LOCALE);
 		assertThat(profile.getOrders().isEmpty(), is(true));
 		
 		pm.deleteProfile(profile);
