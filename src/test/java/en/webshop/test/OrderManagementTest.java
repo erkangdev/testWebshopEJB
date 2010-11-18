@@ -160,7 +160,6 @@ public class OrderManagementTest {
 		assertThat(orderPositions.size(), is(countOrderPositions+1));
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void createOrder() throws ProfileNotFoundException, OrderDuplicateException, OrderValidationException, ArticleNotFoundException, InvalidEmailException {
 		final String profileId = PROFILE_EMAIL_EXISTENT;
@@ -184,12 +183,13 @@ public class OrderManagementTest {
 		pos.setQuantity(amount2);
 		order.getOrderPositions().add(pos);
 		pos.setOrder(order);
-
-		Profile profile = pm.findProfileByEmail(profileId, LOCALE);
-		order.setCustomer(profile);
-		profile.getOrders().add(order);
 		
+		Profile profile = pm.findProfileWithOrdersByEmail(profileId, LOCALE);
+		order.setCustomer(profile);
 		order = om.createOrder(order, Locale.getDefault(), false);
+		
+		profile.addOrder(order);
+		
 		assertThat(order.getOrderPositions().size(), is(2));
 		for (OrderPosition li: order.getOrderPositions()) {
 			assertThat(li.getArticle().getArticleNo(), anyOf(is(articleNo1), is(articleNo2)));
