@@ -75,6 +75,8 @@ public class OrderManagementTest {
 	private static final String USERNAME = "rd@sc.de";
 	private static final String PASSWORD = "pass";
 	
+	
+	
 	/**
 	 */
 	@Deployment
@@ -120,6 +122,14 @@ public class OrderManagementTest {
 		thrown.expect(OrderNotFoundException.class);
 		@SuppressWarnings("unused")
 		Order order = om.findOrderByOrderId(new Long(-1), LOCALE);
+	}
+	
+	@Test
+	public void findOrdersByEmail() throws OrderNotFoundException{
+		
+		List<Order> orders = om.findOrdersByEmail(PROFILE_EMAIL_EXISTENT);
+		
+		assertThat(orders == null || orders.size() == 0, is(false));
 	}
 	
 	/*@Test
@@ -198,4 +208,6 @@ public class OrderManagementTest {
 		profile = order.getCustomer();
 		assertThat(profile.getEmail(), is(profileId));
 	}
+	
+	
 }
