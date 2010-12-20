@@ -201,15 +201,5 @@ public class ArticleManagementTest {
 			assertThat(a.getCategory(), is(notNullValue()));
 		}
 	}
-	
-	@Test
-	public void testConcurrentUpdates() throws AttributeNotFoundException {
-		final String attributename = ATTRIBUTE_NAME_AVAILABLE;
-		final Collection<Attribute> attributes = am.findAttributesByName(attributename);
-		assertThat(attributes.isEmpty(),is(false));
-		for (Attribute a: attributes) {
-			assertThat(a.getName().equals(attributename), is(true));
-			assertThat(a.getCategory(), is(notNullValue()));
-		}
-	}
+
 }
