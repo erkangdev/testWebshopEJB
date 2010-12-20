@@ -42,6 +42,8 @@ import en.webshop.profileManagement.service.ProfileValidationException;
 import en.webshop.profileManagement.service.StatusAlreadySetException;
 import en.webshop.test.util.ArchiveUtil;
 import en.webshop.test.util.DbReloadProvider;
+import en.webshop.util.ConcurrentDeletedException;
+import en.webshop.util.ConcurrentUpdatedException;
 
 
 @RunWith(Arquillian.class)
@@ -195,7 +197,7 @@ public class ProfileManagementTest {
 	}
 
 	@Test // error
-	public void createProfile() throws ProfileDuplicateException, ProfileValidationException {
+	public void createProfile() throws ProfileDuplicateException, ProfileValidationException, ConcurrentDeletedException, ConcurrentUpdatedException {
 		final String lastName = PROFILE_NEW_LAST_NAME;
 		final String email = PROFILE_NEW_EMAIL;
 		final String telephoneNo = PROFILE_NEW_TELEPHONE_NO;
