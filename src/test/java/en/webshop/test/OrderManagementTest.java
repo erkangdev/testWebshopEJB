@@ -262,12 +262,16 @@ public class OrderManagementTest {
 		Order o = new Order(customer, modeOfPayment, addrName, addrStreet,
 				addrHouseNo, addrPostcode, addrCity, status, orderPositions);
 		
+		thrown.expect(ArticleQuantityException.class);
+		
 		om.createOrder(o, LOCALE, true);
 		
-		Order o2 = new Order(customer, modeOfPayment, addrName, addrStreet,
+		/*Order o2 = new Order(customer, modeOfPayment, addrName, addrStreet,
 				addrHouseNo, addrPostcode, addrCity, status, orderPositions);
 		
-		om.createOrder(o2, LOCALE, true);
+		thrown.expect(ArticleQuantityException.class);
+		
+		om.createOrder(o2, LOCALE, true);*/
 		
 		assertThat(true, is(true));
 
