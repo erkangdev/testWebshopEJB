@@ -88,6 +88,8 @@ public class ProfileManagementTest {
 	private static final String ADMIN_USERNAME = "admin@hs-karlsruhe.de";
 	private static final String ADMIN_PASSWORD = "pass";
 	
+	private static final String CONCURRENT_UPDATE = "update";
+	
 	/**
 	 */
 	@Deployment
@@ -196,7 +198,7 @@ public class ProfileManagementTest {
 		pm.findProfileByEmail(email, LOCALE);
 	}
 
-	@Test // error
+	@Test
 	public void createProfile() throws ProfileDuplicateException, ProfileValidationException, ConcurrentDeletedException, ConcurrentUpdatedException {
 		final String lastName = PROFILE_NEW_LAST_NAME;
 		final String email = PROFILE_NEW_EMAIL;
@@ -241,7 +243,50 @@ public class ProfileManagementTest {
 		
 		assertThat(profile.getLastName()==oldLastName, is(false));
 	}
-
+	/*
+	@Test
+	public void updateProfileConflict() throws ProfileValidationException, ProfileDuplicateException, 
+											   InterruptedException, ProfileNotFoundException, 
+											   InvalidEmailException, ProfileDeleteOrderException, 
+											   LoginException, InvalidEmailException, 
+											   ConcurrentDeletedException, ProfileDeleteArticleException, 
+											   ConcurrentUpdatedException  {
+		Profile newProfile = new Profile();
+		newProfile.setLastName("Conflict");
+		newProfile.setFirstName("Conflict");
+		newProfile.setEmail("Conflict@Conflict.org");
+		newProfile.setTelephoneNo("000000000");
+		newProfile.setRole(1);
+		newProfile.setStatus(0);
+		newProfile.setAddrName("Conflict");
+		newProfile.setAddrStreet("Conflict");
+		newProfile.setAddrHouseNo("0");
+		newProfile.setAddrPostcode("00000");
+		newProfile.setAddrCity("Conflict");
+		newProfile.setPassword("pass");
+		newProfile.setRepeatPassword("pass");
+		
+		newProfile = pm.createProfile(newProfile, LOCALE, false);
+		
+		final ConcurrencyHelper concurrentUpdate = new ConcurrencyHelper(CONCURRENT_UPDATE, newProfile.getEmail());
+		concurrentUpdate.run();		//startet einen parallelen Thread
+		concurrentUpdate.join();	//wartet auf das Ende des Threads
+		
+		newProfile.setFirstName(newProfile.getFirstName() + "Conflict");
+		LOGGER.error("updateProfile: begin");
+		try {
+			pm.updateProfile(newProfile, LOCALE, false);
+			fail("KundeUpdatedException wurde nicht geworfen");
+		}
+		catch (ConcurrentUpdatedException e) {
+			securityClient.logout();
+			securityClient.setSimple(ADMIN_USERNAME, ADMIN_PASSWORD);
+			securityClient.login();
+			
+			pm.deleteProfile(newProfile);
+		}
+	}
+	*/
 	@Test
 	public void deleteProfile()
 		   throws ProfileDeleteOrderException, ProfileNotFoundException, InvalidEmailException, 
@@ -280,5 +325,61 @@ public class ProfileManagementTest {
 	
 		final Profile profileAfter = pm.findProfileByEmail(email, LOCALE);
 		assertThat(profileAfter.getStatus(), is(PROFILE_STATUS_DEACTIVATED));
+	}
+	
+	private class ConcurrencyHelper extends Thread {
+		private String cmd;
+		private String email;
+		
+		private ConcurrencyHelper(String cmd, String email) {
+			super(cmd + "_" + email);       // Der Thread erhaelt das Kommando zzgl. Kundennr als Name
+			this.cmd = cmd;
+			this.email = email;
+		}
+		
+		@Override
+		public void run() {
+			if ("update".equals(cmd)) {
+				update();
+			}
+			else if ("delete".equals(cmd)) {
+				delete();
+			}
+			else {
+				System.err.println("Zulaessige Kommandos: \"update\" und \"delete\"");
+			}
+			return;
+		}
+		
+		private void update() {
+			try {
+				final Profile profile = pm.findProfileByEmail(email, LOCALE);
+				profile.setFirstName(profile.getFirstName() + "concurrent");
+				pm.updateProfile(profile, LOCALE, false);
+			}
+			catch (Exception e) {
+				throw new IllegalStateException(e);
+			}
+		}
+
+		private void delete() {
+			securityClient.logout();
+			securityClient.setSimple(ADMIN_USERNAME, ADMIN_PASSWORD);
+			try {
+				securityClient.login();
+			}
+			catch (LoginException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+			
+			try {
+				Profile profile = pm.findProfileByEmail(email, LOCALE);
+				pm.deleteProfile(profile);
+			}
+			catch (Exception e) {
+				throw new IllegalStateException(e);
+			}
+		}
 	}
 }
