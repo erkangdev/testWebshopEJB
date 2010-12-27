@@ -237,6 +237,9 @@ public class OrderManagementTest {
 
 	@Test
 	public void testArticleQuantytyNotEnough() throws ArticleNotFoundException, ProfileNotFoundException, InvalidEmailException, OrderValidationException, OrderDuplicateException, ArticleQuantityException {
+		
+		thrown.expect(ArticleQuantityException.class);
+		
 		final String profileEmail = PROFILE_EMAIL_EXISTENT;
 		final String articleNo1   = ARTICLE_NO_1; // VZ90/10
 		final short amount1       = ARTICLE_AMOUNT_1; // 1
@@ -261,8 +264,6 @@ public class OrderManagementTest {
 		
 		Order o = new Order(customer, modeOfPayment, addrName, addrStreet,
 				addrHouseNo, addrPostcode, addrCity, status, orderPositions);
-		
-		thrown.expect(ArticleQuantityException.class);
 		
 		om.createOrder(o, LOCALE, true);
 		
