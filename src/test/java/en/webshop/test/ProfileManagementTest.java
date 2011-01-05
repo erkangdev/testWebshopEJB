@@ -232,18 +232,20 @@ public class ProfileManagementTest {
 	}
 	
 	@Test
-	public void updateProfile() throws ProfileNotFoundException, InvalidEmailException
+	public void updateProfile() throws ProfileNotFoundException, InvalidEmailException, ProfileValidationException, ProfileDuplicateException, ConcurrentDeletedException, ConcurrentUpdatedException
 	{
 		final String email = PROFILE_EMAIL_AVAILABLE;
 		final String newLastName = PROFILE_LAST_NAME_UNAVAILABLE;
-		final Profile profile = pm.findProfileByEmail(email, LOCALE);
+		Profile profile = pm.findProfileByEmail(email, LOCALE);
 		
-		final String oldLastName = profile.getLastName();
 		profile.setLastName(newLastName);
 		
-		assertThat(profile.getLastName()==oldLastName, is(false));
+		profile = pm.updateProfile(profile, LOCALE, false);
+		assertThat(profile.getLastName() , is(newLastName));
+		profile = pm.findProfileByEmail(email, LOCALE);
+		assertThat(profile.getLastName() , is(newLastName));
 	}
-	/*
+	
 	@Test
 	public void updateProfileConflict() throws ProfileValidationException, ProfileDuplicateException, 
 											   InterruptedException, ProfileNotFoundException, 
@@ -251,10 +253,15 @@ public class ProfileManagementTest {
 											   LoginException, InvalidEmailException, 
 											   ConcurrentDeletedException, ProfileDeleteArticleException, 
 											   ConcurrentUpdatedException  {
+		
+		final String password = PROFILE_NEW_PASSWORD;
+		
+		thrown.expect(ConcurrentUpdatedException.class);
+		
 		Profile newProfile = new Profile();
 		newProfile.setLastName("Conflict");
 		newProfile.setFirstName("Conflict");
-		newProfile.setEmail("Conflict@Conflict.org");
+		newProfile.setEmail("conflict@conflict.org");
 		newProfile.setTelephoneNo("000000000");
 		newProfile.setRole(1);
 		newProfile.setStatus(0);
@@ -263,10 +270,13 @@ public class ProfileManagementTest {
 		newProfile.setAddrHouseNo("0");
 		newProfile.setAddrPostcode("00000");
 		newProfile.setAddrCity("Conflict");
-		newProfile.setPassword("pass");
-		newProfile.setRepeatPassword("pass");
+		newProfile.setPassword(password);
+		newProfile.setRepeatPassword(password);
 		
-		newProfile = pm.createProfile(newProfile, LOCALE, false);
+		assertThat(newProfile.getRepeatPassword() != null, is(true));
+		
+		pm.createProfile(newProfile, LOCALE, false);
+		Profile createdProfile = pm.findProfileByEmail(newProfile.getEmail(), LOCALE);
 		
 		final ConcurrencyHelper concurrentUpdate = new ConcurrencyHelper(CONCURRENT_UPDATE, newProfile.getEmail());
 		concurrentUpdate.run();		//startet einen parallelen Thread
@@ -274,19 +284,10 @@ public class ProfileManagementTest {
 		
 		newProfile.setFirstName(newProfile.getFirstName() + "Conflict");
 		LOGGER.error("updateProfile: begin");
-		try {
-			pm.updateProfile(newProfile, LOCALE, false);
-			fail("KundeUpdatedException wurde nicht geworfen");
-		}
-		catch (ConcurrentUpdatedException e) {
-			securityClient.logout();
-			securityClient.setSimple(ADMIN_USERNAME, ADMIN_PASSWORD);
-			securityClient.login();
-			
-			pm.deleteProfile(newProfile);
-		}
+		
+		pm.updateProfile(createdProfile, LOCALE, false);
 	}
-	*/
+	
 	@Test
 	public void deleteProfile()
 		   throws ProfileDeleteOrderException, ProfileNotFoundException, InvalidEmailException, 
