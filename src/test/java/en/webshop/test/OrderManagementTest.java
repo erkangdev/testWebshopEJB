@@ -71,7 +71,8 @@ public class OrderManagementTest {
 	private ArticleManagement am;
 
 	private static final String PROFILE_EMAIL_EXISTENT = "max@hs-karlsruhe.de";
-	// private static final Integer ORDER_ID_EXISTENT = 700;
+	private static final long ORDER_ID_EXISTENT = 502;
+	private static final long ORDER_ID_EXISTENT_2 = 501;
 	private static final String ARTICLE_NO_1 = "VZ90/10";
 	private static final short ARTICLE_AMOUNT_1 = 1;
 	private static final String ARTICLE_NO_2 = "VZ130/1011";
@@ -147,6 +148,36 @@ public class OrderManagementTest {
 		List<Order> orders = om.findOrdersByEmail(PROFILE_EMAIL_EXISTENT);
 
 		assertThat(orders == null || orders.size() == 0, is(false));
+	}
+	
+	@Test
+	public void findSizeOfOrder(Long orderId) throws OrderPositionNotFoundException {
+		
+		List<OrderPosition> orderPosition = om.findOrderPositions(ORDER_ID_EXISTENT);
+		
+		assertThat(orderPosition.size() == 3, is(true));
+	}
+	
+	@Test
+	public void findOrderPositionComplaint(Long orderId) throws OrderPositionNotFoundException {
+		
+		List<OrderPosition> orderPosition = om.findOrderPositions(ORDER_ID_EXISTENT_2);
+		
+		OrderPosition pos1 = orderPosition.get(1);
+		String comment = pos1.getComplainedComment();
+		
+		assertThat(comment, is (notNullValue()) );
+	}
+
+	@Test
+	public void findOrderPositionQuantity(Long orderId) throws OrderPositionNotFoundException {
+		
+		List<OrderPosition> orderPosition = om.findOrderPositions(ORDER_ID_EXISTENT_2);
+		
+		OrderPosition pos1 = orderPosition.get(0);
+		int quantity = pos1.getQuantity();
+		
+		assertThat(quantity == 7, is (true) );
 	}
 
 	/*
