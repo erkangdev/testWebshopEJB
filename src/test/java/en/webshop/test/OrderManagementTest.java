@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.ejb.EJB;
+import javax.ejb.EJBAccessException;
 import javax.security.auth.login.LoginException;
 
 import org.jboss.arquillian.api.Deployment;
@@ -228,6 +229,54 @@ public class OrderManagementTest {
 			OrderDuplicateException, OrderValidationException,
 			ArticleNotFoundException, InvalidEmailException,
 			ArticleQuantityException {
+		final String profileId = PROFILE_EMAIL_EXISTENT;
+		final String articleNo1 = ARTICLE_NO_1; // VZ90/10
+		final short amount1 = ARTICLE_AMOUNT_1; // 1
+		final String articleNo2 = ARTICLE_NO_2; // VZ130/1011
+		final short amount2 = ARTICLE_AMOUNT_2; // 2
+
+		Order order = new Order();
+		final List<OrderPosition> orderPosition = new ArrayList<OrderPosition>();
+		order.setOrderPositions(orderPosition);
+
+		Article article = am.findArticleByArticleNo(articleNo1);
+		OrderPosition pos = new OrderPosition(article);
+		pos.setQuantity(amount1);
+		order.getOrderPositions().add(pos);
+		pos.setOrder(order);
+
+		article = am.findArticleByArticleNo(articleNo2);
+		pos = new OrderPosition(article);
+		pos.setQuantity(amount2);
+		order.getOrderPositions().add(pos);
+		pos.setOrder(order);
+
+		Profile profile = pm.findProfileWithOrdersByEmail(profileId, LOCALE);
+		order.setCustomer(profile);
+		order = om.createOrder(order, Locale.getDefault(), false);
+
+		profile.addOrder(order);
+
+		assertThat(order.getOrderPositions().size(), is(2));
+		for (OrderPosition li : order.getOrderPositions()) {
+			assertThat(li.getArticle().getArticleNo(),
+					anyOf(is(articleNo1), is(articleNo2)));
+		}
+
+		profile = order.getCustomer();
+		assertThat(profile.getEmail(), is(profileId));
+	}
+	
+	@Test
+	public void createOrderLogout() throws ProfileNotFoundException,
+			OrderDuplicateException, OrderValidationException,
+			ArticleNotFoundException, InvalidEmailException,
+			ArticleQuantityException {
+		
+		securityClient.logout();
+		
+		thrown.expect(EJBAccessException.class);
+		
 		final String profileId = PROFILE_EMAIL_EXISTENT;
 		final String articleNo1 = ARTICLE_NO_1; // VZ90/10
 		final short amount1 = ARTICLE_AMOUNT_1; // 1
