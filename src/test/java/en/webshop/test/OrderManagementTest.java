@@ -42,12 +42,15 @@ import en.webshop.orderManagement.service.OrderManagement;
 import en.webshop.orderManagement.service.OrderNotFoundException;
 import en.webshop.orderManagement.service.OrderPositionNotFoundException;
 import en.webshop.orderManagement.service.OrderValidationException;
+import en.webshop.orderManagement.service.StatusAlreadySetException;
 import en.webshop.profileManagement.domain.Profile;
 import en.webshop.profileManagement.service.InvalidEmailException;
 import en.webshop.profileManagement.service.ProfileManagement;
 import en.webshop.profileManagement.service.ProfileNotFoundException;
 import en.webshop.test.util.ArchiveUtil;
 import en.webshop.test.util.DbReloadProvider;
+import en.webshop.util.ConcurrentDeletedException;
+import en.webshop.util.ConcurrentUpdatedException;
 
 @RunWith(Arquillian.class)
 public class OrderManagementTest {
@@ -95,6 +98,7 @@ public class OrderManagementTest {
 	private static final String ADDR_CITY = null;
 
 	private static final int ORDER_STATUS = 0;
+	private static final int ORDER_STATUS_FINISHED = 2;
 
 	/**
 	 */
@@ -152,22 +156,22 @@ public class OrderManagementTest {
 	}
 	
 	@Test
-	public void findSizeOfOrder(Long orderId) throws OrderPositionNotFoundException {
+	public void setOrderStatus() throws OrderNotFoundException, InvalidOrderIdException, StatusAlreadySetException, ConcurrentUpdatedException, ConcurrentDeletedException {
+		Order order = om.findOrderByOrderId(ORDER_ID_EXISTENT, LOCALE);
+		int statusOld = order.getStatus();
+		om.setStatusForOrder(order, ORDER_STATUS_FINISHED, LOCALE);
 		
-		List<OrderPosition> orderPosition = om.findOrderPositions(ORDER_ID_EXISTENT);
-		
-		assertThat(orderPosition.size() == 3, is(true));
+		order = om.findOrderByOrderId(ORDER_ID_EXISTENT, LOCALE);
+		int statusNew = order.getStatus();
+		assertThat(statusOld == statusNew, is(false));
 	}
 	
 	@Test
-	public void findOrderPositionComplaint(Long orderId) throws OrderPositionNotFoundException {
-		
-		List<OrderPosition> orderPosition = om.findOrderPositions(ORDER_ID_EXISTENT_2);
-		
-		OrderPosition pos1 = orderPosition.get(1);
-		String comment = pos1.getComplainedComment();
-		
-		assertThat(comment, is (notNullValue()) );
+	public void findComplaintsByCustomer() throws ProfileNotFoundException, InvalidEmailException {
+		Profile customer = pm.findProfileByEmail("tim-wiese@hs-karlsruhe.de", LOCALE);
+		List<OrderPosition> complaints = om.findComplaintsByCustomer(customer);
+		for (int i = 0; i < complaints.size(); i++)
+			assertThat(complaints.get(i) == null, is(false));
 	}
 
 	@Test
