@@ -232,7 +232,7 @@ public class OrderManagementTest {
 	public void createOrder() throws ProfileNotFoundException,
 			OrderDuplicateException, OrderValidationException,
 			ArticleNotFoundException, InvalidEmailException,
-			ArticleQuantityException {
+			ArticleQuantityException, ConcurrentDeletedException, ConcurrentUpdatedException {
 		final String profileId = PROFILE_EMAIL_EXISTENT;
 		final String articleNo1 = ARTICLE_NO_1; // VZ90/10
 		final short amount1 = ARTICLE_AMOUNT_1; // 1
@@ -275,7 +275,7 @@ public class OrderManagementTest {
 	public void createOrderLogout() throws ProfileNotFoundException,
 			OrderDuplicateException, OrderValidationException,
 			ArticleNotFoundException, InvalidEmailException,
-			ArticleQuantityException {
+			ArticleQuantityException, ConcurrentDeletedException, ConcurrentUpdatedException {
 		
 		securityClient.logout();
 		
@@ -320,7 +320,7 @@ public class OrderManagementTest {
 	}
 
 	@Test
-	public void testArticleQuantytyNotEnough() throws ArticleNotFoundException, ProfileNotFoundException, InvalidEmailException, OrderValidationException, OrderDuplicateException, ArticleQuantityException {
+	public void testArticleQuantytyNotEnough() throws ArticleNotFoundException, ProfileNotFoundException, InvalidEmailException, OrderValidationException, OrderDuplicateException, ArticleQuantityException, ConcurrentDeletedException, ConcurrentUpdatedException {
 		
 		thrown.expect(ArticleQuantityException.class);
 		
