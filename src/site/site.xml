@@ -10,7 +10,7 @@
 	</skin>
 
 	<body>
-		<menu name="testHskaArquillian">
+		<menu name="testWebshopArquillian">
 			<item name="Home" href="index.html"/>
 			<item name="Summary" href="project-summary.html"/>
 			<item name="Overview" href="project-info.html"/>
