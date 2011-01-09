@@ -37,6 +37,7 @@ import en.webshop.articleManagement.service.ArticleQuantityException;
 import en.webshop.orderManagement.domain.Order;
 import en.webshop.orderManagement.domain.OrderPosition;
 import en.webshop.orderManagement.service.InvalidOrderIdException;
+import en.webshop.orderManagement.service.NoOrderPostionsException;
 import en.webshop.orderManagement.service.OrderDuplicateException;
 import en.webshop.orderManagement.service.OrderManagement;
 import en.webshop.orderManagement.service.OrderNotFoundException;
@@ -232,7 +233,7 @@ public class OrderManagementTest {
 	public void createOrder() throws ProfileNotFoundException,
 			OrderDuplicateException, OrderValidationException,
 			ArticleNotFoundException, InvalidEmailException,
-			ArticleQuantityException, ConcurrentDeletedException, ConcurrentUpdatedException {
+			ArticleQuantityException, ConcurrentDeletedException, ConcurrentUpdatedException, NoOrderPostionsException {
 		final String profileId = PROFILE_EMAIL_EXISTENT;
 		final String articleNo1 = ARTICLE_NO_1; // VZ90/10
 		final short amount1 = ARTICLE_AMOUNT_1; // 1
@@ -275,7 +276,7 @@ public class OrderManagementTest {
 	public void createOrderLogout() throws ProfileNotFoundException,
 			OrderDuplicateException, OrderValidationException,
 			ArticleNotFoundException, InvalidEmailException,
-			ArticleQuantityException, ConcurrentDeletedException, ConcurrentUpdatedException {
+			ArticleQuantityException, ConcurrentDeletedException, ConcurrentUpdatedException, NoOrderPostionsException {
 		
 		securityClient.logout();
 		
@@ -320,7 +321,7 @@ public class OrderManagementTest {
 	}
 
 	@Test
-	public void testArticleQuantytyNotEnough() throws ArticleNotFoundException, ProfileNotFoundException, InvalidEmailException, OrderValidationException, OrderDuplicateException, ArticleQuantityException, ConcurrentDeletedException, ConcurrentUpdatedException {
+	public void testArticleQuantytyNotEnough() throws ArticleNotFoundException, ProfileNotFoundException, InvalidEmailException, OrderValidationException, OrderDuplicateException, ArticleQuantityException, ConcurrentDeletedException, ConcurrentUpdatedException, NoOrderPostionsException {
 		
 		thrown.expect(ArticleQuantityException.class);
 		
