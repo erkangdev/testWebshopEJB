@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Locale;
 
 import javax.ejb.EJB;
+import javax.ejb.EJBAccessException;
 import javax.security.auth.login.LoginException;
 
 import org.jboss.arquillian.api.Deployment;
@@ -193,6 +194,16 @@ public class ProfileManagementTest {
 		
 		pm.findProfilesByLastName(lastName, PROFILE_ROLE_CUSTOMER, LOCALE);
 	}
+	
+	@Test
+	public void findProfileWithLastNameUnauthorised() throws ProfileNotFoundException, InvalidLastNameException {
+		logoutClient();
+		// Login mit KUNDE
+		securityClient.setSimple(PROFILE_EMAIL_AVAILABLE, PASSWORD);
+		final String lastName = PROFILE_LAST_NAME_AVAILABLE;
+		thrown.expect(EJBAccessException.class);
+		pm.findProfilesByLastName(lastName, PROFILE_ROLE_CUSTOMER, LOCALE);
+	}
 
 	@Test
 	public void findProfileWithInvalidEmail() throws ProfileNotFoundException, InvalidEmailException {
@@ -316,22 +327,6 @@ public class ProfileManagementTest {
 		
 		final Collection<Profile> profilePost = pm.findAllProfilesByRole(PROFILE_ROLE_CUSTOMER);
 		assertThat(profilePre.size()-1, is(profilePost.size()));
-	}
-	
-	@Test
-	public void deactivateProfile() throws ProfileNotFoundException, InvalidEmailException, 
-			InvalidEmailException, StatusAlreadySetException {
-		final int deactivated = PROFILE_STATUS_DEACTIVATED;
-		final String email = PROFILE_EMAIL_AVAILABLE;
-		final Profile profile = pm.findProfileByEmail(email, LOCALE);
-	
-		final Profile profileBefore = pm.findProfileByEmail(email, LOCALE);
-		assertThat(profileBefore, is(notNullValue()));
-		
-		pm.setProfileStatus(profile, deactivated);
-	
-		final Profile profileAfter = pm.findProfileByEmail(email, LOCALE);
-		assertThat(profileAfter.getStatus(), is(PROFILE_STATUS_DEACTIVATED));
 	}
 	
 	private class ConcurrencyHelper extends Thread {
