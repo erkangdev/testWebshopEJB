@@ -147,12 +147,18 @@ public class ProfileManagementTest {
 			assertThat(p.getLastName(), is(lastName));
 			assertThat(p.getRole(), either(is(PROFILE_ROLE_CUSTOMER)).or(is(PROFILE_ROLE_SUPPLIER)).or(is(PROFILE_ROLE_ADMIN)));
 			
-			// Nur zur Veranschaulichung von both().and()
-			// Wenn Gleichheit mit einem anderen Namen, dann ja auch != null ...
+			/** 
+			 * Nur zur Veranschaulichung von both().and()
+			 * Wenn Gleichheit mit einem anderen Namen, dann ja auch != null ...
+			 * @return
+			 */
 			assertThat(p.getLastName(), both(is(notNullValue())).and(is(lastName)));
 			
-			// Veranschaulichung von allOf: mehrere Argumente moeglich,
-			// d.h. nicht nur 2 wie bei both().and()
+			/**
+			 *  Veranschaulichung von allOf: mehrere Argumente moeglich,
+			 * d.h. nicht nur 2 wie bei both().and()
+			 * @return
+			 */
 			assertThat(p.getLastName(), allOf(is(notNullValue()), is(lastName)));
 		}
 	}

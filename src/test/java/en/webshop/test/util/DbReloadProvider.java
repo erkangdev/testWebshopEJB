@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
  * Jetzt wird die DB nicht mehr neu geladen, weil es in JBoss nicht dbunit.jar
  * gibt und weil die DB bereits beim eigentlichen Start der JUnit-Tests neu
  * geladen wurde.
+ * @return
  */
 public abstract class DbReloadProvider {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DbReloadProvider.class);
@@ -29,14 +30,20 @@ public abstract class DbReloadProvider {
 		
 		LOGGER.info("Trying database reload...");
 		if (classnameClassLoader.startsWith("org.jboss")) {
-			// Classloader von JBoss, d.h. *kein* Neuladen der DB, da sie bereits
-			// beim normalen Start von JUnit ueber den Classloader von Sun (s.o.)
-			// geladen wurde
+			/** 
+			 * Classloader von JBoss, d.h. *kein* Neuladen der DB, 
+			 * da sie bereits beim normalen Start von JUnit ueber 
+			 * den Classloader von Sun (s.o.) geladen wurde
+			 * @return
+			 */
 			LOGGER.info("...no database reload in JBoss");
 			return;
 		}
 
-		// "Normaler" Classloader von z.B. Sun und *NICHT* von JBoss, d.h. Neuladen der DB
+		/**
+		 * "Normaler" Classloader von z.B. Sun und *NICHT* von JBoss, d.h. Neuladen der DB
+		 * @return
+		 */
 		final Class<?> clazz = Class.forName(IMPL_CLASS);
 		final Class<? extends DbReload> dbReloadImplClass = clazz.asSubclass(DbReload.class);
 		final DbReload dbReload = dbReloadImplClass.newInstance();

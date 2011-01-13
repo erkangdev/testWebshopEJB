@@ -110,36 +110,53 @@ public class ArticleManagementTest {
 		LOGGER.error("BEGINN findArticleVorhanden");
 		/** 
 		 * ArticleNo VZ90/10
+		 * @return
 		 */
 		final String articleNo = ARTICLE_NO_AVAILABLE;
 
 		LOGGER.error("BEGINN am.findArticleByArticleNo(articleNo)" + articleNo);
-		// Suche ein objekt anhand einer vorhandenen articleNo
+		/** 
+		 * Suche ein objekt anhand einer vorhandenen articleNo
+		 * @return
+		 */
 		Article article = am.findArticleByArticleNo(articleNo);
 
 		assertThat(article == null, is(false));
 
 		LOGGER.error("BEGINN article.getAttributes()");
-		// Speichere alle attribute des article objekts in attributes
+		/** 
+		 * Speichere alle attribute des article objekts in attributes
+		 * @return
+		 */
 		// TODO: bis hier her funktioniert es.
-		// article.getAttributes().size();
 		article = am.findArticleByArticleNoWithAttributes(articleNo);
 		article.getAttributes().size();
 		final List<Attribute> attributes = article.getAttributes();
 
 		LOGGER.error("BEGINN attributes.isEmpty():" + attributes.isEmpty());
-		// Artikel VZ90/10 hat Attribute 5,12,14,?,
+		/** 
+		 * Artikel VZ90/10 hat Attribute 5,12,14,?,
+		 * @return
+		 */
 		assertThat(attributes.isEmpty(), is(false));
 
-		// Hole alle Artikel zu jedem attribute des objekts article
+		/**
+		 * Hole alle Artikel zu jedem attribute des objekts article
+		 * @return
+		 */
 		if (attributes != null) {
-			// Falls irgendwo die Verbindung nicht passt wird die var false
-			// boolean doeswork = true;
+			/**
+			 * Falls irgendwo die Verbindung nicht passt wird die var false
+			 * @return
+			 */
 			LOGGER.error("BEGINN attributes Details");
 			for (int i = 0; i < attributes.size(); i++) {
 
 				LOGGER.error("BEGINN articlesPerAttribute Details");
-				// hole zu jedem attribute alle articles
+				/** 
+				 * hole zu jedem attribute alle articles
+				 * @return
+				 */
 
 				Attribute attribute = am.findAttributeByIdWithArticles(attributes.get(i).getId());
 				List<Article> articlesPerAttribute = attribute.getArticles();
@@ -149,11 +166,6 @@ public class ArticleManagementTest {
 					// Umstaendlich TODO: Weg wenn andere methode funktioniert:
 					// ueberpruefe ob bei jedem attribute genau ein article
 					// das gleiche ist wie das objekt article
-					/*
-					 * Integer count = 0; if
-					 * (articlesPerAttribute.get(j).equals(article)) { count++;
-					 * } if(count != 1) doeswork = false;
-					 */
 					if (articlesPerAttribute.get(j).getArticleNo() == "501")
 						assertThat(article,
 								is(sameInstance(articlesPerAttribute.get(j))));

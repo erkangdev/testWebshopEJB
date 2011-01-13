@@ -58,10 +58,6 @@ public class OrderManagementTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ArticleManagementTest.class);
-	private static final String CONCURRENT_UPDATE = "update";
-	private static final String CONCURRENT_DELETE = "delete";
 	private static final Locale LOCALE = Locale.GERMAN;
 
 	private static SecurityClient securityClient;
@@ -186,25 +182,6 @@ public class OrderManagementTest {
 		assertThat(quantity == 7, is (true) );
 	}
 
-	/*
-	 * @Test public void findProfileByOrderIdExistent() throws
-	 * ProfileNotFoundException, OrderNotFoundException { final Integer orderId
-	 * = ORDER_ID_EXISTENT;
-	 * assertThat(om.findProfileByOrderId(Integer.valueOf(orderId)),
-	 * is(notNullValue()));
-	 * 
-	 * Profile testProfile = om.findProfileByOrderId(Integer.valueOf(orderId));
-	 * 
-	 * }
-	 */
-
-	/*
-	 * @Test public void findOrderByProfileExistent() throws
-	 * OrderNotFoundException { final Integer profileId = PROFILE_ID_EXISTENT;
-	 * List<Order> orderList = om.findOrdersByProfileId(profileId);
-	 * assertThat(orderList.size(), is(2)); }
-	 */
-
 	@Test
 	public void addOrderPositionToOrder() throws ProfileNotFoundException,
 			OrderDuplicateException, OrderValidationException,
@@ -262,6 +239,7 @@ public class OrderManagementTest {
 
 		profile.addOrder(order);
 
+		// TODO: brauchen wir: anyOf(is(articleNo1), is(articleNo2))?
 		assertThat(order.getOrderPositions().size(), is(2));
 		for (OrderPosition li : order.getOrderPositions()) {
 			assertThat(li.getArticle().getArticleNo(),
@@ -310,6 +288,7 @@ public class OrderManagementTest {
 
 		profile.addOrder(order);
 
+		// TODO: brauchen wir: anyOf(is(articleNo1), is(articleNo2))?
 		assertThat(order.getOrderPositions().size(), is(2));
 		for (OrderPosition li : order.getOrderPositions()) {
 			assertThat(li.getArticle().getArticleNo(),
@@ -352,89 +331,13 @@ public class OrderManagementTest {
 		
 		om.createOrder(o, LOCALE, true);
 		
-		/*Order o2 = new Order(customer, modeOfPayment, addrName, addrStreet,
-				addrHouseNo, addrPostcode, addrCity, status, orderPositions);
-		
-		thrown.expect(ArticleQuantityException.class);
-		
-		om.createOrder(o2, LOCALE, true);*/
-		
 		assertThat(true, is(true));
 
 	}
 
-	/**
-	 */
+	// TODO: Die Methode implementieren bzw. löschen
 	private class ConcurrencyHelper extends Thread {
-//		private String cmd;
-//		private Long orderId;
-//
-//		/**
-//		 */
-//		private ConcurrencyHelper(String cmd, Long orderId) {
-//			// Der Thread erhaelt das Kommando zzgl. Kundennr als Name
-//			super(cmd + "_" + orderId);
-//			this.cmd = cmd;
-//			this.orderId = orderId;
-//		}
-//
-//		/**
-//		 */
-//		@Override
-//		public void run() {
-//			LOGGER.debug("BEGINN run");
-//
-//			if ("update".equals(cmd)) {
-//				update();
-//			} else if ("delete".equals(cmd)) {
-//				delete();
-//			} else {
-//				System.err
-//						.println("Zulaessige Kommandos: \"update\" und \"delete\"");
-//			}
-//			LOGGER.debug("ENDE run");
-//			return;
-//		}
 
-		/**
-		 */
-//		private void update() {
-//			LOGGER.debug("BEGINN update");
-//
-//			try {
-//				final Order order = om.findOrderByOrderId(orderId, LOCALE);
-//				order.setAddrStreet(order.getAddrStreet() + "concurrent");
-//				om.equals(obj);
-//				kv.updateKunde(kunde, LOCALE, false, false);
-//			} catch (Exception e) {
-//				throw new IllegalStateException(e);
-//			}
-//
-//			LOGGER.debug("ENDE update");
-//		}
-//
-//		/**
-//		 */
-//		private void delete() {
-//			LOGGER.debug("BEGINN delete");
-//
-//			securityClient.logout();
-//			securityClient.setSimple(USERNAME_ADMIN, PASSWORD_ADMIN);
-//			try {
-//				securityClient.login();
-//			} catch (LoginException e) {
-//				e.printStackTrace();
-//				throw new RuntimeException(e);
-//			}
-//
-//			try {
-//				kv.deleteKundeById(orderId, LOCALE);
-//			} catch (Exception e) {
-//				throw new IllegalStateException(e);
-//			}
-//
-//			LOGGER.debug("ENDE delete");
-//		}
 	}
 
 }

@@ -40,7 +40,10 @@ public class DbReloadImpl implements DbReload {
 	private static boolean dbReloaded = false;
 	
 	static {
-		// Properties-Datei einlesen
+		/**
+		 * Properties-Datei einlesen
+		 * @return
+		 */
 		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		final InputStream inputStream = classLoader.getResourceAsStream(PROPSFILE);
 		Properties props = new Properties();
@@ -60,14 +63,20 @@ public class DbReloadImpl implements DbReload {
 			}
 		}
 		
-		// Properties fuer DB-Connection einlesen
+		/**
+		 * Properties fuer DB-Connection einlesen
+		 * @return
+		 */
 		URL = props.getProperty("url", URL_DEFAULT);
 		SCHEMA = props.getProperty("schema", SCHEMA_DEFAULT);
 		USERNAME = props.getProperty("username", USERNAME_DEFAULT);
 		PASSWORD = props.getProperty("password");
 		XML_FLAT_DATASET = props.getProperty("xmlDataset", XML_FLAT_DATASET_DEFAULT);
 		
-		// Name der Treiber-Klasse setzen
+		/**
+		 * Name der Treiber-Klasse setzen
+		 * @return
+		 */
 		String driver;
 		if (URL.contains("postgres")) {
 			driver = "org.postgresql.Driver"; 
@@ -91,7 +100,10 @@ public class DbReloadImpl implements DbReload {
 			throw new IllegalStateException("Die Datenbank-URL " + URL + " wird nicht unterstuetzt");
 		}
 		
-		// Treiber-Klasse laden, um spaeter eine JDBC-Verbindung zu oeffnen
+		/**
+		 * Treiber-Klasse laden, um spaeter eine JDBC-Verbindung zu oeffnen
+		 * @return
+		 */
 		try {
 			Class.forName(driver);
 		}
