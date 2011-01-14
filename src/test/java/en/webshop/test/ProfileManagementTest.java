@@ -40,7 +40,6 @@ import en.webshop.profileManagement.service.ProfileDuplicateException;
 import en.webshop.profileManagement.service.ProfileManagement;
 import en.webshop.profileManagement.service.ProfileNotFoundException;
 import en.webshop.profileManagement.service.ProfileValidationException;
-import en.webshop.profileManagement.service.StatusAlreadySetException;
 import en.webshop.test.util.ArchiveUtil;
 import en.webshop.test.util.DbReloadProvider;
 import en.webshop.util.ConcurrentDeletedException;
@@ -65,7 +64,6 @@ public class ProfileManagementTest {
 	private static final int PROFILE_ROLE_SUPPLIER = 2;
 	private static final int PROFILE_ROLE_ADMIN = 0;
 	private static final int PROFILE_STATUS_ACTIVATED = 0;
-	private static final int PROFILE_STATUS_DEACTIVATED = 1;
 	private static final String PROFILE_LAST_NAME_AVAILABLE = "Mustermann";
 	private static final String PROFILE_LAST_NAME_UNAVAILABLE = "Unavailable";
 	private static final String PROFILE_LAST_NAME_INVALID = "?";
