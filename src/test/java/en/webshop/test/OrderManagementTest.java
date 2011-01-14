@@ -55,6 +55,10 @@ import en.webshop.util.ConcurrentUpdatedException;
 
 @RunWith(Arquillian.class)
 public class OrderManagementTest {
+    
+    private static final Logger LOGGER = LoggerFactory
+    .getLogger(OrderManagementTest.class);
+    
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
@@ -302,8 +306,6 @@ public class OrderManagementTest {
 	@Test
 	public void testArticleQuantytyNotEnough() throws ArticleNotFoundException, ProfileNotFoundException, InvalidEmailException, OrderValidationException, OrderDuplicateException, ArticleQuantityException, ConcurrentDeletedException, ConcurrentUpdatedException, NoOrderPostionsException {
 		
-		thrown.expect(ArticleQuantityException.class);
-		
 		final String profileEmail = PROFILE_EMAIL_EXISTENT;
 		final String articleNo1   = ARTICLE_NO_1; // VZ90/10
 		final short amount1       = ARTICLE_AMOUNT_1; // 1
@@ -318,7 +320,10 @@ public class OrderManagementTest {
 		final int status          = ORDER_STATUS; 
 		
 		Article article = am.findArticleByArticleNo(articleNo1);
+		assertThat(article != null, is(true));
+		
 		OrderPosition op = new OrderPosition(article, 1000);
+
 		List<OrderPosition> orderPositions = new ArrayList<OrderPosition>();
 		orderPositions.add(op);
 		
@@ -329,14 +334,15 @@ public class OrderManagementTest {
 		Order o = new Order(customer, modeOfPayment, addrName, addrStreet,
 				addrHouseNo, addrPostcode, addrCity, status, orderPositions);
 		
+		op.setOrder(o);
+		
+		LOGGER.error("OrderManagementTest=" + op);
+		
+		thrown.expect(ArticleQuantityException.class);
+		
 		om.createOrder(o, LOCALE, true);
 		
 		assertThat(true, is(true));
-
-	}
-
-	// TODO: Die Methode implementieren bzw. löschen
-	private class ConcurrencyHelper extends Thread {
 
 	}
 
