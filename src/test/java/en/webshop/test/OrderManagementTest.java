@@ -210,7 +210,8 @@ public class OrderManagementTest {
 		assertThat(orderPositions.size(), is(countOrderPositions + 1));
 	}
 
-	@Test
+	@SuppressWarnings("unchecked")
+    @Test
 	public void createOrder() throws ProfileNotFoundException,
 			OrderDuplicateException, OrderValidationException,
 			ArticleNotFoundException, InvalidEmailException,
@@ -243,7 +244,6 @@ public class OrderManagementTest {
 
 		profile.addOrder(order);
 
-		// TODO: brauchen wir: anyOf(is(articleNo1), is(articleNo2))?
 		assertThat(order.getOrderPositions().size(), is(2));
 		for (OrderPosition li : order.getOrderPositions()) {
 			assertThat(li.getArticle().getArticleNo(),
@@ -254,7 +254,8 @@ public class OrderManagementTest {
 		assertThat(profile.getEmail(), is(profileId));
 	}
 	
-	@Test
+	@SuppressWarnings("unchecked")
+    @Test
 	public void createOrderLogout() throws ProfileNotFoundException,
 			OrderDuplicateException, OrderValidationException,
 			ArticleNotFoundException, InvalidEmailException,
@@ -292,7 +293,6 @@ public class OrderManagementTest {
 
 		profile.addOrder(order);
 
-		// TODO: brauchen wir: anyOf(is(articleNo1), is(articleNo2))?
 		assertThat(order.getOrderPositions().size(), is(2));
 		for (OrderPosition li : order.getOrderPositions()) {
 			assertThat(li.getArticle().getArticleNo(),
@@ -308,9 +308,6 @@ public class OrderManagementTest {
 		
 		final String profileEmail = PROFILE_EMAIL_EXISTENT;
 		final String articleNo1   = ARTICLE_NO_1; // VZ90/10
-		final short amount1       = ARTICLE_AMOUNT_1; // 1
-		final String articleNo2   = ARTICLE_NO_2;     // VZ130/1011
-		final short amount2       = ARTICLE_AMOUNT_2; // 2
 		final int modeOfPayment   = MODE_OF_PAYMENT;  // 0
 		final String addrName     = ADDR_NAME;
 		final String addrStreet   = ADDR_STREET;
