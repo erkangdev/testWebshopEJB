@@ -96,7 +96,6 @@ public class ArticleManagementTest {
 		securityClient.logout();
 	}
 
-	// TODO: Test Fehlerhaft
 	/**
 	 * org.hibernate.LazyInitializationException: failed to lazily initialize a
 	 * collection of role:
@@ -128,7 +127,7 @@ public class ArticleManagementTest {
 		 * Speichere alle attribute des article objekts in attributes
 		 * @return
 		 */
-		// TODO: bis hier her funktioniert es.
+
 		article = am.findArticleByArticleNoWithAttributes(articleNo);
 		article.getAttributes().size();
 		final List<Attribute> attributes = article.getAttributes();
@@ -163,7 +162,6 @@ public class ArticleManagementTest {
 
 				// article(VZ90/10).Attribute.articles.containarticleWithID(VZ90/10)
 				for (int j = 0; j < articlesPerAttribute.size(); j++) {
-					// Umstaendlich TODO: Weg wenn andere methode funktioniert:
 					// ueberpruefe ob bei jedem attribute genau ein article
 					// das gleiche ist wie das objekt article
 					if (articlesPerAttribute.get(j).getArticleNo() == "501")
