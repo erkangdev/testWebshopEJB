@@ -25,8 +25,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import en.webshop.articleManagement.domain.Article;
 import en.webshop.articleManagement.domain.Attribute;
@@ -40,9 +38,6 @@ import en.webshop.test.util.DbReloadProvider;
 
 @RunWith(Arquillian.class)
 public class ArticleManagementTest {
-
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ArticleManagementTest.class);
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -106,14 +101,13 @@ public class ArticleManagementTest {
 	 */
 	@Test
 	public void findArticleVorhanden() throws ArticleNotFoundException, AttributeNotFoundException {
-		LOGGER.error("BEGINN findArticleVorhanden");
+		
 		/** 
 		 * ArticleNo VZ90/10
 		 * @return
 		 */
 		final String articleNo = ARTICLE_NO_AVAILABLE;
-
-		LOGGER.error("BEGINN am.findArticleByArticleNo(articleNo)" + articleNo);
+		
 		/** 
 		 * Suche ein objekt anhand einer vorhandenen articleNo
 		 * @return
@@ -122,7 +116,6 @@ public class ArticleManagementTest {
 
 		assertThat(article == null, is(false));
 
-		LOGGER.error("BEGINN article.getAttributes()");
 		/** 
 		 * Speichere alle attribute des article objekts in attributes
 		 * @return
@@ -132,7 +125,6 @@ public class ArticleManagementTest {
 		article.getAttributes().size();
 		final List<Attribute> attributes = article.getAttributes();
 
-		LOGGER.error("BEGINN attributes.isEmpty():" + attributes.isEmpty());
 		/** 
 		 * Artikel VZ90/10 hat Attribute 5,12,14,?,
 		 * @return
@@ -148,10 +140,9 @@ public class ArticleManagementTest {
 			 * Falls irgendwo die Verbindung nicht passt wird die var false
 			 * @return
 			 */
-			LOGGER.error("BEGINN attributes Details");
+
 			for (int i = 0; i < attributes.size(); i++) {
 
-				LOGGER.error("BEGINN articlesPerAttribute Details");
 				/** 
 				 * hole zu jedem attribute alle articles
 				 * @return

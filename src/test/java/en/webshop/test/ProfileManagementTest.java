@@ -28,8 +28,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import en.webshop.profileManagement.domain.Profile;
 import en.webshop.profileManagement.service.InvalidEmailException;
@@ -48,7 +46,6 @@ import en.webshop.util.ConcurrentUpdatedException;
 
 @RunWith(Arquillian.class)
 public class ProfileManagementTest {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ProfileManagement.class);
 	
 	private static final Locale LOCALE = Locale.GERMAN;
 	
@@ -298,7 +295,6 @@ public class ProfileManagementTest {
 		concurrentUpdate.join();	//wartet auf das Ende des Threads
 		
 		newProfile.setFirstName(newProfile.getFirstName() + "Conflict");
-		LOGGER.error("updateProfile: begin");
 		
 		pm.updateProfile(createdProfile, LOCALE, false);
 	}
@@ -315,7 +311,6 @@ public class ProfileManagementTest {
 		final Collection<Profile> profilePre = pm.findAllProfilesByRole(PROFILE_ROLE_CUSTOMER);
 	
 		Profile profile = pm.findProfileByEmail(email, LOCALE);
-		LOGGER.debug("profilelog: " + profile);
 		assertThat(profile, is(notNullValue()));
 		
 		profile = pm.findProfileWithOrdersByEmail(profile.getEmail(), LOCALE);
